@@ -5,18 +5,17 @@ import copy
 
 class ConstantGrowthRevenue(RevenueBase):
     
-    def __init__(self, knownRevenueStreams, growthRate, perpetualGrowthRate, perpetualDiscount):
-        self._knownRevenueStreams = knownRevenueStreams
+    def __init__(self, growthRate, perpetualGrowthRate, perpetualDiscount):
         self._growthRate = growthRate
         self._perpetualGrowthRate = perpetualGrowthRate
         self._perpetualDiscount = perpetualDiscount
 
-    def getRevenueStreams(self, untilTime):
-        lastTime = self._knownRevenueStreams.columns.values[-1]
+    def getRevenueStreams(self, revenueStreams, untilTime):
+        lastTime = revenueStreams.columns.values[-1]
         if untilTime <= lastTime:
-            return self._knownRevenueStreams
+            return revenueStreams
 
-        revenueStreamPredictions = copy.deepcopy(self._knownRevenueStreams)
+        revenueStreamPredictions = copy.deepcopy(revenueStreams)
 
         while True:
             lastTime = revenueStreamPredictions.columns.values[-1]
