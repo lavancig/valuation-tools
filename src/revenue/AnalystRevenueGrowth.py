@@ -1,3 +1,4 @@
+from pandas.core.indexes.base import Index
 from .RevenueBase import RevenueBase
 import pandas as pd
 import numpy as np 
@@ -5,18 +6,17 @@ import copy
 
 class AnalystRevenueGrowth(RevenueBase):
     
-    def __init__(self, analystEstimates, perpetualGrowthRate, perpetualDiscount, timeNow):
+    def __init__(self, analystEstimates, perpetualGrowthRate, timeNow):
         self._analystEstimates = analystEstimates
         self._perpetualGrowthRate = perpetualGrowthRate
-        self._perpetualDiscount = perpetualDiscount
         self._timeNow = timeNow
 
-    def getRevenueStreams(self, knownRevenueStreams, untilTime):
-        lastTime = knownRevenueStreams.columns.values[-1]
+    def getRevenueStreams(self, knownRevenueStreams, untilTime, perpetualDiscount):
+        lastTime = knownRevenueStreams.index.values[-1]
         if untilTime <= lastTime:
             return knownRevenueStreams
 
-        revenueStreamPredictions = copy.deepcopy(knownRevenueStreams)
+        revenueStreamPredictions = pd.DataFrame([knownRevenueStreams.values], columns=knownRevenueStreams.index, index=['Revenue'])
 
         while True:
             lastTime = revenueStreamPredictions.columns.values[-1]
@@ -33,13 +33,13 @@ class AnalystRevenueGrowth(RevenueBase):
             elif (timeDistance.astype(int) > 2) and (timeDistance.astype(int) <= 7):
                 growthRate = self._analystEstimates.loc['+5Y']
             else:
-                growthRate = self._perpetualDiscount
-            lastRevenue = revenueStreamPredictions.loc['Total Revenue', lastTime]
-            revenueStreamPredictions.loc['Total Revenue', nextTime] = lastRevenue * (1 + growthRate)
+                growthRate = self._perpetualGrowthRate
+            lastRevenue = revenueStreamPredictions.loc['Revenue', lastTime]
+            revenueStreamPredictions.loc['Revenue', nextTime] = lastRevenue * (1 + growthRate)
             
         lastTime = revenueStreamPredictions.columns.values[-1]
-        lastRevenue = revenueStreamPredictions.loc['Total Revenue', lastTime]
-        revenueStreamPredictions.loc['Total Revenue','perpetual'] = lastRevenue * (1 + self._perpetualGrowthRate) / ( self._perpetualDiscount - self._perpetualGrowthRate)
+        lastRevenue = revenueStreamPredictions.loc['Revenue', lastTime]
+        revenueStreamPredictions.loc['Revenue', 'perpetual'] = lastRevenue * (1 + self._perpetualGrowthRate) / ( perpetualDiscount - self._perpetualGrowthRate)
         return revenueStreamPredictions
 
 

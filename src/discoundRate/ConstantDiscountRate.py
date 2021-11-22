@@ -12,6 +12,7 @@ class ConstantDiscountRate(DiscountRateBase):
         discountRates = pd.DataFrame(np.asarray(np.ones([1, len(dates)]) * self._discountRate))
         discountRates.columns = dates.values
         discountRates.index = ['Discount Rate']
+        discountRates['perpetual'] = self._discountRate
         return discountRates
 
 
