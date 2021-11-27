@@ -29,3 +29,5 @@ class WACCDiscountRate(DiscountRateBase):
         return self._constantDiscountRateObj.getDiscountRates(dates)
 
 
+    def getType():
+        return "WACC"

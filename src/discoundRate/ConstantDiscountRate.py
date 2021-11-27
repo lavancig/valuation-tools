@@ -16,3 +16,5 @@ class ConstantDiscountRate(DiscountRateBase):
         return discountRates
 
 
+    def getType():
+        return "Constant"

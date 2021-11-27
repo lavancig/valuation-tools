@@ -16,7 +16,7 @@ from .discoundRate.WACCDiscountRate import WACCDiscountRate
 from .PresentValue import PresentValue
 
 # Calculates fair value based on free cash flow to equity
-class DCF_FCFF:
+class DCF_FCFE:
     def __init__(self, companyTicker):
         self._successful = False
         self.downloadCompanyData(companyTicker)
@@ -36,7 +36,7 @@ class DCF_FCFF:
 
         # Present Value Object
         self._presentValueObj = PresentValue(self._timeNow)
-        
+            
     def downloadCompanyData(self, ticker):
         try:
             self._companyData = yf.Ticker(ticker)
@@ -108,7 +108,17 @@ class DCF_FCFF:
             totalTimeIndexes = totalTimeIndexes.union([nextTime])
         return totalTimeIndexes
 
-    def getResultTable(self):
+    def getValuationSummaryTable(self):
         resultTable = pd.concat([self._revenueTable, self._incomeTable, self._discountTable, self._presentValueTable])
         resultTable.loc['Fair Value', self._timeNow] = self._pricePerShare
         return resultTable
+
+    def getFairValue(self):
+        return self._pricePerShare
+
+    def setDiscountWACC(self):
+        self._discountRateObj = WACCDiscountRate(self._financialData, self._balancesheetData, getGlobal('RiskFreeInterestRate'), getGlobal('marketReturn'), self._companyInfo['beta'])
+
+
+    def setDiscountConstant(self, value):
+        self._discountRateObj = ConstantDiscountRate(value)

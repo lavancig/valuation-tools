@@ -1,19 +1,26 @@
 
 from src.globals import loadGlobals
 
-from src.gui.guiMain import guiMain
+from src.gui.guiMain import GuiMain
+from src.Controller import Controller
+from src.ValuationModel import ValuationModel
 
-
-
-from datetime import date
 import numpy as np
-import pandas as pd
 
 
 
 def mainFunction():
     loadGlobals()
-    guiMain()
+    guiObj = GuiMain()
+    modelObj = ValuationModel()
+    ControllerObj = Controller(guiObj, modelObj)
+
+    guiObj.registerController(ControllerObj)
+    modelObj.registerController(ControllerObj)
+
+    guiObj.startGUI()
+
+
 
 if __name__ == "__main__":
     mainFunction()
