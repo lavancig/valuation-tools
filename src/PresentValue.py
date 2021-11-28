@@ -24,9 +24,9 @@ class PresentValue:
                 indexes = np.where(np.logical_and(laterThanNow, beforeDate))
                 for idx in indexes[0]:
                     discountRate = discountRate * (1 + discountRates.loc['Discount Rate'][idx])
-                presentValues.loc['Present Value', date] = fcfValues.loc['Income', date] / discountRate
+                presentValues.loc['Present Value', date] = fcfValues.loc['FCFE', date] / discountRate
         # Present value of perpetual growth part. Keeps the last discount rate and multiplies by the perpetual growth
-        presentValues.loc['Present Value', 'perpetual'] = fcfValues.loc['Income', 'perpetual'] / (discountRate * (1 + discountRates.loc['Discount Rate', 'perpetual']))
+        presentValues.loc['Present Value', 'perpetual'] = fcfValues.loc['FCFE', 'perpetual'] / (discountRate * (1 + discountRates.loc['Discount Rate', 'perpetual']))
         return presentValues
 
     def getPresentValue(self, fcfValues, discountRates):

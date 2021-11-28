@@ -10,6 +10,8 @@ from .revenue.AnalystRevenueGrowth import AnalystRevenueGrowth
 
 from .income.ConstantMarginIncome import ConstantMarginIncome
 
+from .fcf.ConstantIncomeToFCF import ConstantIncomeToFCF
+
 from .discoundRate.ConstantDiscountRate import ConstantDiscountRate
 from .discoundRate.WACCDiscountRate import WACCDiscountRate
 
@@ -30,6 +32,9 @@ class DCF_FCFE:
         # Income Projection Object
         self._incomeObj = ConstantMarginIncome(self._financialData.loc['Total Revenue'], self._financialData.loc['Net Income From Continuing Ops'])
         
+        # Free cash flow object
+        self._fcfObj = ConstantIncomeToFCF(self._financialData, self._cashFlowData)
+
         # Discount Rate Object
         self._discountRateObj = WACCDiscountRate(self._financialData, self._balancesheetData, getGlobal('RiskFreeInterestRate'), getGlobal('marketReturn'), self._companyInfo['beta'])
         # discountRateObj = ConstantDiscountRate(0.12)
@@ -56,6 +61,12 @@ class DCF_FCFE:
         self._balancesheetData.columns = np.asarray(np.flip(balancesheetDataYF.columns.values))
         self._balancesheetData.index = balancesheetDataYF.index
 
+        # Flips data because yahoo finance is stupid and the columns are ordered backwards
+        cashFlowDataYF = self._companyData.cashflow
+        self._cashFlowData = pd.DataFrame(np.asarray(np.fliplr(cashFlowDataYF.values)))
+        self._cashFlowData.columns = np.asarray(np.flip(cashFlowDataYF.columns.values))
+        self._cashFlowData.index = cashFlowDataYF.index
+
         # analysis data
         self._analysis = self._companyData.analysis
 
@@ -73,10 +84,14 @@ class DCF_FCFE:
         self._revenueTable = self.predictRevenue(timeIntoTheFuture, self._discountTable.loc['Discount Rate', 'perpetual'])
         self._incomeTable = self.predictIncome(self._revenueTable, self._financialData.loc['Net Income From Continuing Ops'])
 
+        # Calculates FCFE
+        self._fcfeTable = self._fcfObj.estimateFCFE(self._incomeTable, self._cashFlowData)
+
+        # Gets shares outstanding from company info
         self._sharesOutstanding = self._companyInfo['sharesOutstanding']
 
-        self._presentValueTable = self.getPresentValueTable(self._incomeTable, self._discountTable)
-        self._pricePerShare = self._presentValueObj.getPresentValue(self._incomeTable, self._discountTable) / self._sharesOutstanding
+        self._presentValueTable = self.getPresentValueTable(self._fcfeTable, self._discountTable)
+        self._pricePerShare = self._presentValueObj.getPresentValue(self._fcfeTable, self._discountTable) / self._sharesOutstanding
         return self._pricePerShare
 
     def predictRevenue(self, timeIntoTheFuture, perpetualDiscount):
@@ -109,7 +124,9 @@ class DCF_FCFE:
         return totalTimeIndexes
 
     def getValuationSummaryTable(self):
-        resultTable = pd.concat([self._revenueTable, self._incomeTable, self._discountTable, self._presentValueTable])
+        profitabilityTable = self._incomeObj.getProfitabilityTable(self._revenueTable, self._incomeTable)
+        cashFlowToNetIncomeTable = self._fcfObj.getCashFlowToNetIncomeRatio(self._fcfeTable, self._incomeTable)
+        resultTable = pd.concat([self._revenueTable, self._incomeTable, profitabilityTable, self._fcfeTable, cashFlowToNetIncomeTable, self._discountTable, self._presentValueTable])
         resultTable.loc['Fair Value', self._timeNow] = self._pricePerShare
         return resultTable
 

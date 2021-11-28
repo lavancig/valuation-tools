@@ -36,22 +36,20 @@ class ValuationTab:
         for rowNo in range(len(tableData.index.values)):
             data = []
             stringData = [str(tableData.index.values[rowNo])]
-            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value':
+            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE':
                 data = tableData.iloc[rowNo].values / 1000000
                 for idx in range(len(data)):
                     stringData.append("{:.0f}".format(data[idx]) + ' M')
-            elif tableData.index.values[rowNo] == 'Discount Rate':
+            elif tableData.index.values[rowNo] == 'Discount Rate' or tableData.index.values[rowNo] == 'Profitability' or tableData.index.values[rowNo] == 'Cash Flow To Net Income Ratio':
                 data = tableData.iloc[rowNo].values
                 for idx in range(len(data)):
                     stringData.append("{:.4f}".format(data[idx]))
             else:
-                data = tableData.iloc[rowNo].values
-                nanEntries = np.isnan(data)
-                for idx in range(len(data)):
-                    if nanEntries[idx]:
+                for data in tableData.iloc[rowNo].values:
+                    if np.isnan(data):
                         stringData.append(" ")
                     else:
-                        stringData.append("{:.2f}".format(data[idx]))
+                        stringData.append("{:.2f}".format(data))
             tree.insert('', tk.END, values=stringData)
         tree.grid(column = 0, row = 1, padx = 10, pady = 10, columnspan = 8, sticky = tk.W+tk.E)
 

@@ -25,4 +25,8 @@ class ConstantMarginIncome(IncomeBase):
             
         return incomeStreamPredictions
 
-
+    def getProfitabilityTable(self, predictedRevenue, predictedIncome):
+        profitabilityPredictions = pd.DataFrame([], columns=predictedIncome.columns.values, index=['Profitability'])
+        for date in predictedRevenue.columns.values:
+            profitabilityPredictions.loc['Profitability', date] = predictedIncome.loc['Income', date] / predictedRevenue.loc['Revenue', date]
+        return profitabilityPredictions
