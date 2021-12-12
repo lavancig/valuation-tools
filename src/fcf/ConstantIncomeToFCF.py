@@ -1,20 +1,29 @@
 import pandas as pd
+import numpy as np
 
 class ConstantIncomeToFCF:
     def __init__(self, financialData, cashFlows):
         nYears = 0
         netIncomeToCashFlowSum = 0
+        lastValidFCFO = 0
         for date in cashFlows.columns:
             nYears = nYears + 1
-            netIncomeToCashFlowSum = netIncomeToCashFlowSum + (cashFlows.loc['Total Cash From Operating Activities', date] + cashFlows.loc['Capital Expenditures', date])/financialData.loc['Net Income From Continuing Ops', date]
+            fcfo = cashFlows.loc['Total Cash From Operating Activities', date] if not np.isnan(cashFlows.loc['Total Cash From Operating Activities', date]) else lastValidFCFO
+            lastValidFCFO = fcfo
+            netIncomeToCashFlowSum = netIncomeToCashFlowSum + (fcfo + cashFlows.loc['Capital Expenditures', date])/financialData.loc['Net Income From Continuing Ops', date]
         self._cashFlowToNetIncomeRatio = netIncomeToCashFlowSum/nYears
 
+    def setCashFlowToNetIncomeRatio(self, ratio):
+        self._cashFlowToNetIncomeRatio = ratio
 
     def estimateFCFE(self, predictedIncome, cashFlows):
         fcfPredictions = pd.DataFrame([], columns=predictedIncome.columns.values, index=['FCFE'])
+        lastValidFCFO = 0
         for date in predictedIncome.columns.values:
             if(date in cashFlows.columns.values):
-                fcfPredictions.loc['FCFE', date] = cashFlows.loc['Total Cash From Operating Activities', date] + cashFlows.loc['Capital Expenditures', date]
+                fcfo = cashFlows.loc['Total Cash From Operating Activities', date] if not np.isnan(cashFlows.loc['Total Cash From Operating Activities', date]) else lastValidFCFO
+                lastValidFCFO = fcfo
+                fcfPredictions.loc['FCFE', date] = fcfo + cashFlows.loc['Capital Expenditures', date]
                 continue
             fcfPredictions.loc['FCFE', date] = predictedIncome.loc['Income', date] * self._cashFlowToNetIncomeRatio
         return fcfPredictions

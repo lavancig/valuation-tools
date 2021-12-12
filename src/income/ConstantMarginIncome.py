@@ -13,6 +13,8 @@ class ConstantMarginIncome(IncomeBase):
             incomeMarginSum = incomeMarginSum + pastIncomeStreams[date]/pastRevenueStreams[date]
         self._incomeMargin = incomeMarginSum/nYears
 
+    def setProfitability(self, profitablity):
+        self._incomeMargin = profitablity
 
     def getIncomeStreams(self, revenueStreams, pastIncomeStreams):
 

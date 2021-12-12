@@ -51,77 +51,98 @@ class ValuationTab:
                     else:
                         stringData.append("{:.2f}".format(data))
             tree.insert('', tk.END, values=stringData)
-        tree.grid(column = 0, row = 1, padx = 10, pady = 10, columnspan = 8, sticky = tk.W+tk.E)
+        tree.grid(column = 0, row = 2, padx = 10, pady = 10, columnspan = 8, sticky = tk.W+tk.E)
 
-
-
+        self._sharesOutstandinglabel.grid(column = 0, row = 1,  padx = 10, pady = 10)
+        self._sharesOutstandinglabelEntry.grid(column = 1, row = 1, padx = 10, pady = 10)
+        self._sharesOutstandinglabelButton.grid(column = 2, row = 1, padx = 10, pady = 10)
 
     def getValuationTab(self):
-        valuationTab = ttk.Frame(self._tabControl)
+        self._valuationTab = ttk.Frame(self._tabControl)
         self._valuationTypeSelection = tk.StringVar(value=valuationTypes[0])
 
-        ttk.Label(valuationTab,
+        ttk.Label(self._valuationTab,
             text ="Valuation Type: ").grid(column = 0,
                                         row = 0, 
                                         padx = 10,
                                         pady = 10)
 
-        ttk.OptionMenu(valuationTab, self._valuationTypeSelection, *valuationTypes).grid(column = 1,
+        ttk.OptionMenu(self._valuationTab, self._valuationTypeSelection, *valuationTypes).grid(column = 1,
                                         row = 0, 
                                         padx = 10,
                                         pady = 10)
 
         # Prediction Window    
-        ttk.Label(valuationTab, text ="Prediction Window: ").grid(column = 2,
+        ttk.Label(self._valuationTab, text ="Prediction Window: ").grid(column = 2,
                                             row = 0, 
                                             padx = 10,
                                             pady = 10)
 
         self._predictionWindow = tk.StringVar(value=DEFAULT_PREDICTION_WINDOW)
-        ttk.Entry(valuationTab, textvariable=self._predictionWindow).grid(column = 3,
+        ttk.Entry(self._valuationTab, textvariable=self._predictionWindow).grid(column = 3,
                                             row = 0, 
                                             padx = 10,
                                             pady = 10)
 
 
         # Company Ticker
-        ttk.Label(valuationTab, text ="Company Ticker: ").grid(column = 4,
+        ttk.Label(self._valuationTab, text ="Company Ticker: ").grid(column = 4,
                                             row = 0, 
                                             padx = 10,
                                             pady = 10)
 
         self._ticker = tk.StringVar()
-        ttk.Entry(valuationTab, textvariable=self._ticker).grid(column = 5,
+        ttk.Entry(self._valuationTab, textvariable=self._ticker).grid(column = 5,
                                             row = 0, 
                                             padx = 10,
                                             pady = 10)
 
         self._loadingLabel = tk.StringVar()
-        ttk.Label(valuationTab, textvariable=self._loadingLabel).grid(column = 7,
+        ttk.Label(self._valuationTab, textvariable=self._loadingLabel).grid(column = 7,
                                             row = 0, 
                                             padx = 10,
                                             pady = 10)
 
-        self._tree = ttk.Treeview(valuationTab, show='headings', height=8)
+        # Shares Outstanding:
+        self._sharesOutstandinglabel = ttk.Label(self._valuationTab, text ="Shares Outstanding: ")
+
+        self._sharesOutstanding = tk.StringVar(value=1)
+        self._sharesOutstandinglabelEntry = ttk.Entry(self._valuationTab, textvariable=self._sharesOutstanding)
+
+        def onButtonPress():
+            def thread_function():        
+                self._controllerObj.setSharesOutstanding(float(self._sharesOutstanding.get()))
+            buttonPressThread = threading.Thread(target=thread_function)
+            buttonPressThread.start()
+
+        self._sharesOutstandinglabelButton = ttk.Button ( self._valuationTab, text="Apply", command = onButtonPress)
+
+
+
+
+        self._tree = ttk.Treeview(self._valuationTab, show='headings', height=8)
 
         def onButtonPress():
             def thread_function():
                 self._tree.grid_forget()
                 self.resetLoadingLabel()
+                self._sharesOutstandinglabel.grid_forget()
+                self._sharesOutstandinglabelEntry.grid_forget()
+                self._sharesOutstandinglabelButton.grid_forget()
                 self._controllerObj.calculateFairValueRequest(self._valuationTypeSelection.get(), self._predictionWindow.get(), self._ticker.get())
                 
             buttonPressThread = threading.Thread(target=thread_function)
             buttonPressThread.start()
 
         
-        ttk.Button ( valuationTab, text="Calculate", command = onButtonPress).grid(column = 6,
+        ttk.Button ( self._valuationTab, text="Calculate", command = onButtonPress).grid(column = 6,
                                                                     row = 0, 
                                                                     padx = 10,
                                                                     pady = 10)
 
 
 
-        return valuationTab
+        return self._valuationTab
 
 
     def updateLoadingLabel(self, fairValue):
@@ -132,7 +153,13 @@ class ValuationTab:
             
     def updateSummaryTable(self, tableData):
         self._tree.grid_forget()
+        self._sharesOutstandinglabel.grid_forget()
+        self._sharesOutstandinglabelEntry.grid_forget()
+        self._sharesOutstandinglabelButton.grid_forget()
         self.fillTable(self._tree, tableData)
     
     def registerController(self, controllerObj):
         self._controllerObj = controllerObj
+
+    def setSharesOutstanding(self, value):
+        self._sharesOutstanding.set(value)

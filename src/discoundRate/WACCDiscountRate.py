@@ -5,15 +5,22 @@ import pandas as pd
 import numpy as np 
 import copy
 
+DEFAULT_COST_OF_DEBT = 0.04
+
 class WACCDiscountRate(DiscountRateBase):
     
     def __init__(self, companyFinancials, companyBalanceSheet, riskFreeInterestRate, marketReturnRate, companyBeta):
         lastTime = companyFinancials.columns.values[-1]
 
-        costOfDebt =  -companyFinancials.loc['Interest Expense', lastTime] / companyBalanceSheet.loc['Total Liab', lastTime]
+        if(companyFinancials.loc['Interest Expense', lastTime] == None):
+            costOfDebt = DEFAULT_COST_OF_DEBT
+        else:
+            costOfDebt =  -companyFinancials.loc['Interest Expense', lastTime] / companyBalanceSheet.loc['Total Liab', lastTime]
         
         taxRate = companyFinancials.loc['Income Tax Expense', lastTime] / companyFinancials.loc['Income Before Tax', lastTime]
 
+        if(companyBeta == None): # Not enough data to calculate beta for the company
+            companyBeta = 2
         costOfEquity = riskFreeInterestRate + companyBeta * (marketReturnRate - riskFreeInterestRate)
 
         wDebt = companyBalanceSheet.loc['Total Liab', lastTime] / (companyBalanceSheet.loc['Total Liab', lastTime] + companyBalanceSheet.loc['Total Stockholder Equity', lastTime])

@@ -88,7 +88,11 @@ class DCF_FCFE:
         self._fcfeTable = self._fcfObj.estimateFCFE(self._incomeTable, self._cashFlowData)
 
         # Gets shares outstanding from company info
-        self._sharesOutstanding = self._companyInfo['sharesOutstanding']
+        if 'sharesOutstanding' in self._companyInfo:
+            self._sharesOutstanding = self._companyInfo['sharesOutstanding']
+        else:
+            self._sharesOutstanding = 1
+        # self._sharesOutstanding = self._balancesheetData.loc['Common Stock'][-1]
 
         self._presentValueTable = self.getPresentValueTable(self._fcfeTable, self._discountTable)
         self._pricePerShare = self._presentValueObj.getPresentValue(self._fcfeTable, self._discountTable) / self._sharesOutstanding
@@ -136,6 +140,29 @@ class DCF_FCFE:
     def setDiscountWACC(self):
         self._discountRateObj = WACCDiscountRate(self._financialData, self._balancesheetData, getGlobal('RiskFreeInterestRate'), getGlobal('marketReturn'), self._companyInfo['beta'])
 
-
     def setDiscountConstant(self, value):
         self._discountRateObj = ConstantDiscountRate(value)
+
+    def setProfitabilityConstant(self, value):
+        self._incomeObj.setProfitability(value)
+
+    def setProfitabilityLastYearsAverage(self):
+        self._incomeObj = ConstantMarginIncome(self._financialData.loc['Total Revenue'], self._financialData.loc['Net Income From Continuing Ops'])
+
+    def setSharesOutstanding(self, number):
+        self._sharesOutstanding = number
+
+    def getSharesOutstanding(self):
+        return self._sharesOutstanding
+
+    def setFCFConstant(self, value):
+        self._fcfObj.setCashFlowToNetIncomeRatio(value)
+
+    def setFCFLastYearsAverage(self):
+        self._fcfObj = ConstantIncomeToFCF(self._financialData, self._cashFlowData)
+
+    def setRevenueSpecialistEstimates(self):
+        self._revenueObj = AnalystRevenueGrowth(self._analysis['Growth'], getGlobal('economyGrowth'), self._timeNow)
+
+    def setRevenueConstant(self, value):
+        self._revenueObj = ConstantGrowthRevenue(value, getGlobal('economyGrowth'))
