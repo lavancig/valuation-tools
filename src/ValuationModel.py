@@ -18,13 +18,19 @@ class ValuationModel:
         else:
             print("Valuation type " + type + " Unimplemented. Aborting")
         
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        # Calculate all three scenarios (this includes the realistic scenario)
+        self._scenarioValues = self._valuationObj.calculateAllScenarios(self._predictionWindow)
+        # Note: calculateAllScenarios already calls calculateFairValue internally for the realistic scenario
         
     def getValuationSummaryTable(self):
         return self._valuationObj.getValuationSummaryTable()
 
     def getFairValue(self):
         return self._valuationObj.getFairValue()
+    
+    def getAllScenarioValues(self):
+        """Get fair values for all three scenarios"""
+        return self._scenarioValues
 
     def setDiscountTypeWACC(self):
         self._valuationObj.setDiscountWACC()

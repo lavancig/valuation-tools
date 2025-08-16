@@ -36,7 +36,7 @@ class ValuationTab:
         for rowNo in range(len(tableData.index.values)):
             data = []
             stringData = [str(tableData.index.values[rowNo])]
-            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE':
+            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE' or tableData.index.values[rowNo] == 'Net Borrowings':
                 data = tableData.iloc[rowNo].values / 1000000
                 for idx in range(len(data)):
                     stringData.append("{:.0f}".format(data[idx]) + ' M')
@@ -44,6 +44,13 @@ class ValuationTab:
                 data = tableData.iloc[rowNo].values
                 for idx in range(len(data)):
                     stringData.append("{:.4f}".format(data[idx]))
+            elif tableData.index.values[rowNo] == 'Revenue Growth Rate':
+                data = tableData.iloc[rowNo].values
+                for idx in range(len(data)):
+                    if np.isnan(data[idx]):
+                        stringData.append(" ")
+                    else:
+                        stringData.append("{:.2%}".format(data[idx]))
             else:
                 for data in tableData.iloc[rowNo].values:
                     if np.isnan(data):
@@ -122,6 +129,25 @@ class ValuationTab:
 
         self._tree = ttk.Treeview(self._valuationTab, show='headings', height=8)
 
+        # Scenario values display
+        self._scenarioFrame = ttk.LabelFrame(self._valuationTab, text="Valuation Scenarios", padding="10")
+        self._scenarioFrame.grid(column=0, row=3, columnspan=8, padx=10, pady=10, sticky=tk.W+tk.E)
+        
+        # Pessimistic scenario
+        ttk.Label(self._scenarioFrame, text="Pessimistic:").grid(column=0, row=0, padx=5, pady=5)
+        self._pessimisticValue = tk.StringVar(value="--")
+        ttk.Label(self._scenarioFrame, textvariable=self._pessimisticValue, font=("Arial", 10, "bold")).grid(column=1, row=0, padx=5, pady=5)
+        
+        # Realistic scenario
+        ttk.Label(self._scenarioFrame, text="Realistic:").grid(column=2, row=0, padx=5, pady=5)
+        self._realisticValue = tk.StringVar(value="--")
+        ttk.Label(self._scenarioFrame, textvariable=self._realisticValue, font=("Arial", 10, "bold")).grid(column=3, row=0, padx=5, pady=5)
+        
+        # Optimistic scenario
+        ttk.Label(self._scenarioFrame, text="Optimistic:").grid(column=4, row=0, padx=5, pady=5)
+        self._optimisticValue = tk.StringVar(value="--")
+        ttk.Label(self._scenarioFrame, textvariable=self._optimisticValue, font=("Arial", 10, "bold")).grid(column=5, row=0, padx=5, pady=5)
+
         def onButtonPress():
             def thread_function():
                 self._tree.grid_forget()
@@ -129,6 +155,7 @@ class ValuationTab:
                 self._sharesOutstandinglabel.grid_forget()
                 self._sharesOutstandinglabelEntry.grid_forget()
                 self._sharesOutstandinglabelButton.grid_forget()
+                self._scenarioFrame.grid_forget()
                 self._controllerObj.calculateFairValueRequest(self._valuationTypeSelection.get(), self._predictionWindow.get(), self._ticker.get())
                 
             buttonPressThread = threading.Thread(target=thread_function)
@@ -147,6 +174,8 @@ class ValuationTab:
 
     def updateLoadingLabel(self, fairValue):
         self._loadingLabel.set('Calculated Fair Value: ' + "{:.2f}".format(fairValue))
+        # Also update the realistic scenario value
+        self._realisticValue.set(f"${fairValue:.2f}")
 
     def resetLoadingLabel(self):
         self._loadingLabel.set('Loading data, please wait')
@@ -157,6 +186,25 @@ class ValuationTab:
         self._sharesOutstandinglabelEntry.grid_forget()
         self._sharesOutstandinglabelButton.grid_forget()
         self.fillTable(self._tree, tableData)
+        
+        # Update scenario values
+        self.updateScenarioValues()
+    
+    def updateScenarioValues(self):
+        """Update the scenario values display with calculated values"""
+        try:
+            scenarioValues = self._controllerObj.getAllScenarioValues()
+            if scenarioValues:
+                self._pessimisticValue.set(f"${scenarioValues['pessimistic']:.2f}")
+                self._realisticValue.set(f"${scenarioValues['realistic']:.2f}")
+                self._optimisticValue.set(f"${scenarioValues['optimistic']:.2f}")
+                
+                # Show the scenario frame
+                self._scenarioFrame.grid(column=0, row=3, columnspan=8, padx=10, pady=10, sticky=tk.W+tk.E)
+        except Exception as e:
+            print(f"Error updating scenario values: {e}")
+            # Hide the scenario frame if there's an error
+            self._scenarioFrame.grid_forget()
     
     def registerController(self, controllerObj):
         self._controllerObj = controllerObj

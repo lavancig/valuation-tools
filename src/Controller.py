@@ -75,3 +75,8 @@ class Controller:
         self._guiObj.updteFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(self._modelObj.getSharesOutstanding())
 
+
+    def getAllScenarioValues(self):
+        """Get all scenario values from the model"""
+        return self._modelObj.getAllScenarioValues()
+

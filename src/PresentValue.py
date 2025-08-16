@@ -23,7 +23,13 @@ class PresentValue:
                 beforeDate = np.array(datevec <= np.datetime64(date, 'ns'))
                 indexes = np.where(np.logical_and(laterThanNow, beforeDate))
                 for idx in indexes[0]:
-                    discountRate = discountRate * (1 + discountRates.loc['Discount Rate'][idx])
+                    # Check if the index is within bounds of the discount rates table
+                    if idx < len(discountRates.columns) - 1:  # -1 to exclude 'perpetual' column
+                        discountRate = discountRate * (1 + discountRates.loc['Discount Rate'].iloc[idx])
+                    else:
+                        # If we're beyond the available discount rates, use the last available rate
+                        last_available_idx = len(discountRates.columns) - 2  # Last year (excluding 'perpetual')
+                        discountRate = discountRate * (1 + discountRates.loc['Discount Rate'].iloc[last_available_idx])
                 presentValues.loc['Present Value', date] = fcfValues.loc['FCFE', date] / discountRate
         # Present value of perpetual growth part. Keeps the last discount rate and multiplies by the perpetual growth
         presentValues.loc['Present Value', 'perpetual'] = fcfValues.loc['FCFE', 'perpetual'] / (discountRate * (1 + discountRates.loc['Discount Rate', 'perpetual']))
