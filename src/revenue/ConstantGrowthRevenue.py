@@ -46,7 +46,7 @@ class ConstantGrowthRevenue(RevenueBase):
         if perpetualDiscount <= self._perpetualGrowthRate:
             # If growth rate >= discount rate, use a capped growth rate
             safeGrowthRate = perpetualDiscount * 0.9  # Use 90% of discount rate
-            print(f"Warning: Perpetual growth rate ({self._perpetualGrowthRate:.4f}) >= discount rate ({perpetualDiscount:.4f}). Using safe growth rate: {safeGrowthRate:.4f}")
+            print(f"Warning: Perpetual growth rate ({self._perpetualGrowthRate:.3f}) >= discount rate ({perpetualDiscount:.3f}). Using safe growth rate: {safeGrowthRate:.3f}")
         else:
             safeGrowthRate = self._perpetualGrowthRate
         

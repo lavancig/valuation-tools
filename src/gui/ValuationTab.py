@@ -4,6 +4,7 @@ from tkinter import ttk
 import time
 from pandastable import Table, TableModel
 import numpy as np
+import pandas as pd
 
 from ..globals import saveGlobals, resetGlobals, setGlobal, getGlobal
 from ..DCF_FCFE import DCF_FCFE
@@ -25,38 +26,66 @@ class ValuationTab:
         tree.heading(0, text=" ")
         tree.column(0, minwidth=0, width=100)
         for columnNo in range(0, len(tableData.columns.values)):
-            if tableData.columns.values[columnNo] == 'perpetual':
-                tree.heading(columnNo + 1, text=tableData.columns.values[columnNo] + " @ " + str(np.datetime64(tableData.columns.values[columnNo-1], 'Y') + np.timedelta64(1,'Y')) )
-                tree.column(columnNo + 1, minwidth=0, width=100)
-            else:
-                tree.heading(columnNo + 1, text=np.datetime64(tableData.columns.values[columnNo], 'Y'))
+            try:
+                if tableData.columns.values[columnNo] == 'perpetual':
+                    tree.heading(columnNo + 1, text=tableData.columns.values[columnNo] + " @ " + str(np.datetime64(tableData.columns.values[columnNo-1], 'Y') + np.timedelta64(1,'Y')) )
+                    tree.column(columnNo + 1, minwidth=0, width=100)
+                else:
+                    # Try to parse as datetime, fallback to string if it fails
+                    try:
+                        column_text = str(np.datetime64(tableData.columns.values[columnNo], 'Y'))
+                    except (ValueError, TypeError):
+                        column_text = str(tableData.columns.values[columnNo])
+                    tree.heading(columnNo + 1, text=column_text)
+                    tree.column(columnNo + 1, minwidth=0, width=70)
+            except Exception as e:
+                # Fallback: just use the column value as a string
+                tree.heading(columnNo + 1, text=str(tableData.columns.values[columnNo]))
                 tree.column(columnNo + 1, minwidth=0, width=70)
 
         
         for rowNo in range(len(tableData.index.values)):
             data = []
             stringData = [str(tableData.index.values[rowNo])]
-            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE' or tableData.index.values[rowNo] == 'Net Borrowings':
+            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE' or tableData.index.values[rowNo] == 'Net Borrowings' or tableData.index.values[rowNo] == 'EBIT' or tableData.index.values[rowNo] == 'D&A' or tableData.index.values[rowNo] == 'CapEx' or tableData.index.values[rowNo] == 'Delta NWC':
                 data = tableData.iloc[rowNo].values / 1000000
                 for idx in range(len(data)):
-                    stringData.append("{:.0f}".format(data[idx]) + ' M')
+                    try:
+                        if pd.isna(data[idx]) or (isinstance(data[idx], (int, float)) and np.isnan(data[idx])):
+                            stringData.append(" ")
+                        else:
+                            stringData.append("{:.0f}".format(data[idx]) + ' M')
+                    except (TypeError, ValueError):
+                        stringData.append(" ")
             elif tableData.index.values[rowNo] == 'Discount Rate' or tableData.index.values[rowNo] == 'Profitability' or tableData.index.values[rowNo] == 'Cash Flow To Net Income Ratio':
                 data = tableData.iloc[rowNo].values
                 for idx in range(len(data)):
-                    stringData.append("{:.4f}".format(data[idx]))
+                    try:
+                        if pd.isna(data[idx]) or (isinstance(data[idx], (int, float)) and np.isnan(data[idx])):
+                            stringData.append(" ")
+                        else:
+                            stringData.append("{:.4f}".format(data[idx]))
+                    except (TypeError, ValueError):
+                        stringData.append(" ")
             elif tableData.index.values[rowNo] == 'Revenue Growth Rate':
                 data = tableData.iloc[rowNo].values
                 for idx in range(len(data)):
-                    if np.isnan(data[idx]):
+                    try:
+                        if pd.isna(data[idx]) or (isinstance(data[idx], (int, float)) and np.isnan(data[idx])):
+                            stringData.append(" ")
+                        else:
+                            stringData.append("{:.2%}".format(data[idx]))
+                    except (TypeError, ValueError):
                         stringData.append(" ")
-                    else:
-                        stringData.append("{:.2%}".format(data[idx]))
             else:
                 for data in tableData.iloc[rowNo].values:
-                    if np.isnan(data):
+                    try:
+                        if pd.isna(data) or (isinstance(data, (int, float)) and np.isnan(data)):
+                            stringData.append(" ")
+                        else:
+                            stringData.append("{:.2f}".format(data))
+                    except (TypeError, ValueError):
                         stringData.append(" ")
-                    else:
-                        stringData.append("{:.2f}".format(data))
             tree.insert('', tk.END, values=stringData)
         tree.grid(column = 0, row = 2, padx = 10, pady = 10, columnspan = 8, sticky = tk.W+tk.E)
 
@@ -127,7 +156,7 @@ class ValuationTab:
 
 
 
-        self._tree = ttk.Treeview(self._valuationTab, show='headings', height=8)
+        self._tree = ttk.Treeview(self._valuationTab, show='headings', height=18)
 
         # Scenario values display
         self._scenarioFrame = ttk.LabelFrame(self._valuationTab, text="Valuation Scenarios", padding="10")
@@ -195,9 +224,23 @@ class ValuationTab:
         try:
             scenarioValues = self._controllerObj.getAllScenarioValues()
             if scenarioValues:
-                self._pessimisticValue.set(f"${scenarioValues['pessimistic']:.2f}")
-                self._realisticValue.set(f"${scenarioValues['realistic']:.2f}")
-                self._optimisticValue.set(f"${scenarioValues['optimistic']:.2f}")
+                # Extract the actual values from the nested dictionary structure
+                pessimistic_val = scenarioValues['pessimistic']['value'] if isinstance(scenarioValues['pessimistic'], dict) else scenarioValues['pessimistic']
+                realistic_val = scenarioValues['realistic']['value'] if isinstance(scenarioValues['realistic'], dict) else scenarioValues['realistic']
+                optimistic_val = scenarioValues['optimistic']['value'] if isinstance(scenarioValues['optimistic'], dict) else scenarioValues['optimistic']
+                
+                # Format the values safely
+                try:
+                    self._pessimisticValue.set(f"${float(pessimistic_val):.2f}")
+                    self._realisticValue.set(f"${float(realistic_val):.2f}")
+                    self._optimisticValue.set(f"${float(optimistic_val):.2f}")
+                except (ValueError, TypeError) as format_error:
+                    print(f"Error formatting scenario values: {format_error}")
+                    print(f"Pessimistic: {pessimistic_val}, Realistic: {realistic_val}, Optimistic: {optimistic_val}")
+                    # Set fallback values
+                    self._pessimisticValue.set("N/A")
+                    self._realisticValue.set("N/A")
+                    self._optimisticValue.set("N/A")
                 
                 # Show the scenario frame
                 self._scenarioFrame.grid(column=0, row=3, columnspan=8, padx=10, pady=10, sticky=tk.W+tk.E)

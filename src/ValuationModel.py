@@ -34,19 +34,23 @@ class ValuationModel:
 
     def setDiscountTypeWACC(self):
         self._valuationObj.setDiscountWACC()
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
+
+    def setDiscountCostOfEquity(self):
+        self._valuationObj.setDiscountCostOfEquity()
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setDiscountTypeConstant(self, value):
         self._valuationObj.setDiscountConstant(value)
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setProfitabilityTypeConstant(self, value):
         self._valuationObj.setProfitabilityConstant(value)
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setProfitabilityTypeLastYearsAverage(self):
         self._valuationObj.setProfitabilityLastYearsAverage()
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setSharesOutstanding(self, number):
         self._valuationObj.setSharesOutstanding(number)
@@ -56,16 +60,16 @@ class ValuationModel:
 
     def setFCFConstant(self, value):
         self._valuationObj.setFCFConstant(value)
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setFCFLastYearsAverage(self):
         self._valuationObj.setFCFLastYearsAverage()
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setRevenueSpecialistEstimates(self):
         self._valuationObj.setRevenueSpecialistEstimates()
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)
 
     def setRevenueConstant(self, value):
         self._valuationObj.setRevenueConstant(value)
-        self._valuationObj.calculateFairValue(self._predictionWindow)
+        self._valuationObj.calculateFairValue(self._predictionWindow, storeResults=True)

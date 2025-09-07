@@ -43,20 +43,29 @@ class ConstantIncomeToFCF:
     def estimateFCFE(self, predictedIncome, cashFlows):
         fcfPredictions = pd.DataFrame([], columns=predictedIncome.columns.values, index=['FCFE'])
         netBorrowingsTable = pd.DataFrame([], columns=predictedIncome.columns.values, index=['Net Borrowings'])
-        lastValidFCFO = 0
         lastValidNetBorrowings = 0
         
         for date in predictedIncome.columns.values:
             if(date in cashFlows.columns.values):
-                fcfo = cashFlows.loc['Operating Cash Flow', date] if pd.notna(cashFlows.loc['Operating Cash Flow', date]) else lastValidFCFO
-                capex = cashFlows.loc['Capital Expenditure', date] if pd.notna(cashFlows.loc['Capital Expenditure', date]) else 0
+                # Get net income for this date
+                netIncome = cashFlows.loc['Net Income', date] if 'Net Income' in cashFlows.index and pd.notna(cashFlows.loc['Net Income', date]) else predictedIncome.loc['Income', date] if pd.notna(predictedIncome.loc['Income', date]) else 0
+                
+                # Get D&A (Depreciation & Amortization)
+                da = cashFlows.loc['D&A', date] if 'D&A' in cashFlows.index and pd.notna(cashFlows.loc['D&A', date]) else 0
+                
+                # Get CapEx (Capital Expenditure)
+                capex = cashFlows.loc['CapEx', date] if 'CapEx' in cashFlows.index and pd.notna(cashFlows.loc['CapEx', date]) else 0
+                
+                # Get ΔNWC (Change in Net Working Capital)
+                deltaNWC = cashFlows.loc['Delta NWC', date] if 'Delta NWC' in cashFlows.index and pd.notna(cashFlows.loc['Delta NWC', date]) else 0
+                
                 # Get net borrowings from the calculated data
                 netBorrowings = cashFlows.loc['Net Borrowings', date] if 'Net Borrowings' in cashFlows.index and pd.notna(cashFlows.loc['Net Borrowings', date]) else lastValidNetBorrowings
                 
-                lastValidFCFO = fcfo
                 lastValidNetBorrowings = netBorrowings
                 
-                fcfPredictions.loc['FCFE', date] = fcfo + capex + netBorrowings
+                # Calculate FCFE using the correct formula: FCFE = Net Income + D&A - CapEx - ΔNWC + Net Borrowings
+                fcfPredictions.loc['FCFE', date] = netIncome + da - capex - deltaNWC + netBorrowings
                 netBorrowingsTable.loc['Net Borrowings', date] = netBorrowings
                 continue
             

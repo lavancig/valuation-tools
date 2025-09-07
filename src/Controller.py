@@ -20,6 +20,12 @@ class Controller:
         self._guiObj.updateValuationSummaryTable(summaryTable)
         self._guiObj.updteFairValue( self._modelObj.getFairValue())
 
+    def setDiscountCostOfEquity(self):
+        self._modelObj.setDiscountCostOfEquity()
+        summaryTable = self._modelObj.getValuationSummaryTable()
+        self._guiObj.updateValuationSummaryTable(summaryTable)
+        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+
 
     def setDiscountTypeConstant(self, value):
         self._modelObj.setDiscountTypeConstant(value)

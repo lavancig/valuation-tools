@@ -4,7 +4,7 @@ from tkinter import ttk
 import threading
 
 
-discountTypes = ("WACC", "Constant")
+discountTypes = ("Cost of Equity", "WACC", "Constant")
 
 class DiscountTab:
     def __init__(self, tabControl):
@@ -34,7 +34,9 @@ class DiscountTab:
 
             def onButtonPress():
                 def thread_function():        
-                    if self._discountTypeSelection.get() == "WACC":
+                    if self._discountTypeSelection.get() == "Cost of Equity":
+                        self._controllerObj.setDiscountCostOfEquity()
+                    elif self._discountTypeSelection.get() == "WACC":
                         self._controllerObj.setDiscountTypeWACC()
                     elif self._discountTypeSelection.get() == "Constant":
                         self._controllerObj.setDiscountTypeConstant(float(self._discountValue.get())/100)
@@ -48,13 +50,22 @@ class DiscountTab:
                                                                         pady = 10)
             self._initialized = True
 
-        if self._discountTypeSelection.get() == "WACC":
+        if self._discountTypeSelection.get() == "Cost of Equity":
+            self.getCostOfEquityDiscountTab()
+        elif self._discountTypeSelection.get() == "WACC":
             self.getWACCDiscountTab()
         elif self._discountTypeSelection.get() == "Constant":
             self.getConstantDiscountTab()
 
 
         return self._discountTab
+
+    def getCostOfEquityDiscountTab(self):
+        # Cost of Equity uses CAPM formula with company beta and market data
+        # No additional parameters needed from user
+        label = ttk.Label(self._discountTab, text="Cost of Equity (CAPM): Uses company beta and market data")
+        label.grid(column=0, row=1, columnspan=2, padx=10, pady=10)
+        self._typeSpecificWidgets.append(label)
 
     def getWACCDiscountTab(self):
         pass

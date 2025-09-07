@@ -9,6 +9,7 @@ from .DiscountTab import DiscountTab
 from .ProfitabilityTab import ProfitabilityTab
 from .fcfTab import FCFTab
 from .RevenueTab import RevenueTab
+from .SensitivityTab import SensitivityTab
 
 tabControl = []
 
@@ -26,6 +27,7 @@ class GuiMain:
         self._profitabilityTab = ProfitabilityTab(tabControl)
         self._fcfTab = FCFTab(tabControl)
         self._revenueTab = RevenueTab(tabControl)
+        self._sensitivityTab = SensitivityTab(tabControl, None)  # Controller will be set later
 
 
 
@@ -37,6 +39,7 @@ class GuiMain:
         fcfTab = self._fcfTab.getFCFTab()
         revenueTab = self._revenueTab.getRevenueTab()
         parametersTab = getParametersTab(tabControl)
+        sensitivityTab = self._sensitivityTab.frame
         
         tabControl.add(suitabilityTab, text ='Suitability')
         tabControl.add(valuationTab, text ='Valuation')
@@ -45,6 +48,7 @@ class GuiMain:
         tabControl.add(fcfTab, text ='FCF')
         tabControl.add(revenueTab, text ='Revenue')
         tabControl.add(parametersTab, text ='Parameters')
+        tabControl.add(sensitivityTab, text ='Sensitivity Analysis')
 
         tabControl.pack(expand = 1, fill ="both")
         
@@ -63,6 +67,13 @@ class GuiMain:
         self._profitabilityTab.registerController(controllerObj)
         self._fcfTab.registerController(controllerObj)
         self._revenueTab.registerController(controllerObj)
+        self._sensitivityTab.controller = controllerObj
+        # Update sensitivity tab status after controller is set (defensively)
+        try:
+            self._sensitivityTab.refresh_status()
+        except Exception:
+            # Ignore errors during initialization
+            pass
 
     def addDiscountTab(self, discountObj):
         discountTab = getDiscountTab(discountObj)
@@ -78,6 +89,12 @@ class GuiMain:
 
     def updateValuationSummaryTable(self, summaryTable):
         self._valuationTab.updateSummaryTable(summaryTable)
+        # Refresh sensitivity tab status when valuation is updated (defensively)
+        try:
+            self._sensitivityTab.refresh_status()
+        except Exception:
+            # Ignore errors if sensitivity tab not ready
+            pass
 
     def getControllerObj(self):
         return self._controllerObj

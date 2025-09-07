@@ -4,7 +4,7 @@ import pickle
 
 
 GLOBAL_VAR_DEFAULTS = {"RiskFreeInterestRate" : 0.0232,
-    "marketReturn": 0.1,
+    "marketReturn": 0.07,
     "economyGrowth": 0.0293}
 globalVars = GLOBAL_VAR_DEFAULTS
 
