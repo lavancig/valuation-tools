@@ -7,7 +7,7 @@ class PresentValue:
     def __init__(self, timeNow):
         self._timeNow = timeNow
 
-    def getPresentValues(self, fcfValues, discountRates):
+    def getPresentValues(self, fcfValues, discountRates, type="FCFE"):
         presentValues = pd.DataFrame()
         discountRate = 1
         for date in fcfValues.columns[:-1]:
@@ -30,10 +30,12 @@ class PresentValue:
                         # If we're beyond the available discount rates, use the last available rate
                         last_available_idx = len(discountRates.columns) - 2  # Last year (excluding 'perpetual')
                         discountRate = discountRate * (1 + discountRates.loc['Discount Rate'].iloc[last_available_idx])
-                presentValues.loc['Present Value', date] = fcfValues.loc['FCFE', date] / discountRate
+                # Handle both FCFE and FCFF
+                presentValues.loc['Present Value', date] = fcfValues.loc[type, date] / discountRate
+
         # Present value of perpetual growth part. Keeps the last discount rate and multiplies by the perpetual growth
-        presentValues.loc['Present Value', 'perpetual'] = fcfValues.loc['FCFE', 'perpetual'] / (discountRate * (1 + discountRates.loc['Discount Rate', 'perpetual']))
+            presentValues.loc['Present Value', 'perpetual'] = fcfValues.loc[type, 'perpetual'] / (discountRate * (1 + discountRates.loc['Discount Rate', 'perpetual']))  
         return presentValues
 
-    def getPresentValue(self, fcfValues, discountRates):
-        return sum(np.squeeze(self.getPresentValues(fcfValues, discountRates).values))
+    def getPresentValue(self, fcfValues, discountRates, type="FCFE"):
+        return sum(np.squeeze(self.getPresentValues(fcfValues, discountRates, type).values))

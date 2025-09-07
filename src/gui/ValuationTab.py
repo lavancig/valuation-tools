@@ -8,16 +8,18 @@ import pandas as pd
 
 from ..globals import saveGlobals, resetGlobals, setGlobal, getGlobal
 from ..DCF_FCFE import DCF_FCFE
+from ..DCF_FCFF import DCF_FCFF
 
 import threading
 
-valuationTypes = ("FCFE", )
+valuationTypes = ("FCFE", "FCFF")
 DEFAULT_PREDICTION_WINDOW = 5 #YEARS
 
 
 class ValuationTab:
-    def __init__(self, tabControl):
+    def __init__(self, tabControl, discountTab=None):
         self._tabControl = tabControl
+        self._discountTab = discountTab
 
     def fillTable(self, tree, tableData):
         tree.delete(*tree.get_children())
@@ -47,7 +49,7 @@ class ValuationTab:
         for rowNo in range(len(tableData.index.values)):
             data = []
             stringData = [str(tableData.index.values[rowNo])]
-            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE' or tableData.index.values[rowNo] == 'Net Borrowings' or tableData.index.values[rowNo] == 'EBIT' or tableData.index.values[rowNo] == 'D&A' or tableData.index.values[rowNo] == 'CapEx' or tableData.index.values[rowNo] == 'Delta NWC':
+            if tableData.index.values[rowNo] == 'Revenue' or tableData.index.values[rowNo] == 'Income' or tableData.index.values[rowNo] == 'Present Value' or tableData.index.values[rowNo] == 'FCFE' or tableData.index.values[rowNo] == 'FCFF' or tableData.index.values[rowNo] == 'Net Borrowings' or tableData.index.values[rowNo] == 'EBIT' or tableData.index.values[rowNo] == 'D&A' or tableData.index.values[rowNo] == 'CapEx' or tableData.index.values[rowNo] == 'Delta NWC' or tableData.index.values[rowNo] == 'Invested Capital':
                 data = tableData.iloc[rowNo].values / 1000000
                 for idx in range(len(data)):
                     try:
@@ -67,7 +69,7 @@ class ValuationTab:
                             stringData.append("{:.4f}".format(data[idx]))
                     except (TypeError, ValueError):
                         stringData.append(" ")
-            elif tableData.index.values[rowNo] == 'Revenue Growth Rate':
+            elif tableData.index.values[rowNo] == 'Revenue Growth Rate' or tableData.index.values[rowNo] == 'Tax Rate':
                 data = tableData.iloc[rowNo].values
                 for idx in range(len(data)):
                     try:
@@ -96,6 +98,9 @@ class ValuationTab:
     def getValuationTab(self):
         self._valuationTab = ttk.Frame(self._tabControl)
         self._valuationTypeSelection = tk.StringVar(value=valuationTypes[0])
+        
+        # Add trace to automatically recalculate when valuation type changes
+        self._valuationTypeSelection.trace('w', self._onValuationTypeChange)
 
         ttk.Label(self._valuationTab,
             text ="Valuation Type: ").grid(column = 0,
@@ -103,7 +108,8 @@ class ValuationTab:
                                         padx = 10,
                                         pady = 10)
 
-        ttk.OptionMenu(self._valuationTab, self._valuationTypeSelection, *valuationTypes).grid(column = 1,
+        self._valuationTypeMenu = tk.OptionMenu(self._valuationTab, self._valuationTypeSelection, *valuationTypes)
+        self._valuationTypeMenu.grid(column = 1,
                                         row = 0, 
                                         padx = 10,
                                         pady = 10)
@@ -176,6 +182,11 @@ class ValuationTab:
         ttk.Label(self._scenarioFrame, text="Optimistic:").grid(column=4, row=0, padx=5, pady=5)
         self._optimisticValue = tk.StringVar(value="--")
         ttk.Label(self._scenarioFrame, textvariable=self._optimisticValue, font=("Arial", 10, "bold")).grid(column=5, row=0, padx=5, pady=5)
+        
+        # Current price
+        ttk.Label(self._scenarioFrame, text="Current Price:").grid(column=6, row=0, padx=5, pady=5)
+        self._currentPriceValue = tk.StringVar(value="--")
+        ttk.Label(self._scenarioFrame, textvariable=self._currentPriceValue, font=("Arial", 10, "bold")).grid(column=7, row=0, padx=5, pady=5)
 
         def onButtonPress():
             def thread_function():
@@ -209,7 +220,7 @@ class ValuationTab:
     def resetLoadingLabel(self):
         self._loadingLabel.set('Loading data, please wait')
             
-    def updateSummaryTable(self, tableData):
+    def updateValuationSummaryTable(self, tableData):
         self._tree.grid_forget()
         self._sharesOutstandinglabel.grid_forget()
         self._sharesOutstandinglabelEntry.grid_forget()
@@ -229,11 +240,25 @@ class ValuationTab:
                 realistic_val = scenarioValues['realistic']['value'] if isinstance(scenarioValues['realistic'], dict) else scenarioValues['realistic']
                 optimistic_val = scenarioValues['optimistic']['value'] if isinstance(scenarioValues['optimistic'], dict) else scenarioValues['optimistic']
                 
+                # Get current price
+                try:
+                    current_price = self._controllerObj.getCurrentPrice()
+                except Exception as e:
+                    print(f"Error getting current price: {e}")
+                    current_price = None
+                
                 # Format the values safely
                 try:
                     self._pessimisticValue.set(f"${float(pessimistic_val):.2f}")
                     self._realisticValue.set(f"${float(realistic_val):.2f}")
                     self._optimisticValue.set(f"${float(optimistic_val):.2f}")
+                    
+                    # Format current price
+                    if current_price is not None:
+                        self._currentPriceValue.set(f"${float(current_price):.2f}")
+                    else:
+                        self._currentPriceValue.set("N/A")
+                        
                 except (ValueError, TypeError) as format_error:
                     print(f"Error formatting scenario values: {format_error}")
                     print(f"Pessimistic: {pessimistic_val}, Realistic: {realistic_val}, Optimistic: {optimistic_val}")
@@ -241,6 +266,7 @@ class ValuationTab:
                     self._pessimisticValue.set("N/A")
                     self._realisticValue.set("N/A")
                     self._optimisticValue.set("N/A")
+                    self._currentPriceValue.set("N/A")
                 
                 # Show the scenario frame
                 self._scenarioFrame.grid(column=0, row=3, columnspan=8, padx=10, pady=10, sticky=tk.W+tk.E)
@@ -249,6 +275,48 @@ class ValuationTab:
             # Hide the scenario frame if there's an error
             self._scenarioFrame.grid_forget()
     
+    def _onValuationTypeChange(self, *args):
+        """Called when valuation type selection changes"""
+        # Update discount type based on valuation type
+        if self._discountTab:
+            valuationType = self._valuationTypeSelection.get()
+            if valuationType == "FCFE":
+                self._discountTab.setDiscountType("Cost of Equity")
+            elif valuationType == "FCFF":
+                self._discountTab.setDiscountType("WACC")
+            
+            
+        
+        # Only recalculate if we have a ticker and controller
+        if hasattr(self, '_controllerObj') and hasattr(self, '_ticker') and self._ticker.get():
+            def thread_function():
+                self._tree.grid_forget()
+                self.resetLoadingLabel()
+                self._sharesOutstandinglabel.grid_forget()
+                self._sharesOutstandinglabelEntry.grid_forget()
+                self._sharesOutstandinglabelButton.grid_forget()
+                self._scenarioFrame.grid_forget()
+                self._controllerObj.calculateFairValueRequest(self._valuationTypeSelection.get(), self._predictionWindow.get(), self._ticker.get())
+                
+            buttonPressThread = threading.Thread(target=thread_function)
+            buttonPressThread.start()
+
+    def setDiscountTab(self, discountTab):
+        """Set reference to discount tab for automatic discount type updates"""
+        self._discountTab = discountTab
+
+    def updateValuationTypeMenu(self, newOptions):
+        """Update the valuation type menu with new options"""
+        # Destroy the old menu
+        self._valuationTypeMenu.destroy()
+        
+        # Create new menu with updated options
+        self._valuationTypeMenu = tk.OptionMenu(self._valuationTab, self._valuationTypeSelection, *newOptions)
+        self._valuationTypeMenu.grid(column = 1,
+                                        row = 0, 
+                                        padx = 10,
+                                        pady = 10)
+
     def registerController(self, controllerObj):
         self._controllerObj = controllerObj
 

@@ -117,17 +117,41 @@ class ConstantMarginIncome(IncomeBase):
             # If no valid data, return empty DataFrame
             return pd.DataFrame()
 
-        # Start with historical income data
-        incomeStreamPredictions = pd.DataFrame([validPastIncomeStreams.values], columns=validPastIncomeStreams.index, index=['Income'])
+        # Convert dates to end of year format
+        end_of_year_dates = []
+        for date in validPastIncomeStreams.index:
+            if hasattr(date, 'year'):
+                # If it's already a datetime, set to end of year
+                end_of_year_dates.append(pd.Timestamp(f"{date.year}-12-31"))
+            else:
+                # If it's a string or other format, try to parse and set to end of year
+                try:
+                    parsed_date = pd.Timestamp(date)
+                    end_of_year_dates.append(pd.Timestamp(f"{parsed_date.year}-12-31"))
+                except:
+                    end_of_year_dates.append(date)  # Fallback to original date
+        
+        # Start with historical income data using end of year dates
+        incomeStreamPredictions = pd.DataFrame([validPastIncomeStreams.values], columns=end_of_year_dates, index=['Income'])
 
         # Calculate future income using profitability table
         for date in revenueStreams.columns.values:
-            if date in validPastIncomeStreams.index:
+            # Convert date to end of year for consistency
+            if hasattr(date, 'year'):
+                end_of_year_date = pd.Timestamp(f"{date.year}-12-31")
+            else:
+                try:
+                    parsed_date = pd.Timestamp(date)
+                    end_of_year_date = pd.Timestamp(f"{parsed_date.year}-12-31")
+                except:
+                    end_of_year_date = date  # Fallback to original date
+            
+            if end_of_year_date in incomeStreamPredictions.columns:
                 continue  # Keep historical data as is
             # Use profitability from table to calculate income
             profitability = profitabilityTable.loc['Profitability', date]
             revenue = revenueStreams.loc['Revenue', date]
-            incomeStreamPredictions.loc['Income', date] = revenue * profitability
+            incomeStreamPredictions.loc['Income', end_of_year_date] = revenue * profitability
             
         return incomeStreamPredictions
 

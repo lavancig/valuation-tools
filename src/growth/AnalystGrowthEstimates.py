@@ -22,8 +22,8 @@ class AnalystGrowthEstimates(GrowthEstimatesBase):
         self._timeNow = timeNow
         
         # Create pessimistic and optimistic growth estimates
-        self._pessimisticEstimates = self._createPessimisticEstimates()
-        self._optimisticEstimates = self._createOptimisticEstimates()
+        # self._pessimisticEstimates = self._createPessimisticEstimates()
+        # self._optimisticEstimates = self._createOptimisticEstimates()
     
     def _createPessimisticEstimates(self):
         """Create pessimistic growth estimates (lower than analyst estimates)"""
@@ -118,11 +118,11 @@ class AnalystGrowthEstimates(GrowthEstimatesBase):
         """
         timeDistanceInt = timeDistance.astype(int)
         
-        if timeDistanceInt == 0:
+        if timeDistanceInt == 1:
             return estimates.loc['0Y']
-        elif timeDistanceInt == 1:
+        elif timeDistanceInt == 2:
             return estimates.loc['+1Y']
-        elif (timeDistanceInt >= 2) and (timeDistanceInt <= 5):
+        elif (timeDistanceInt >= 3) and (timeDistanceInt <= 5):
             # Linear reduction from +1Y to perpetual over years 3-7
             startGrowthRate = estimates.loc['+1Y']
             endGrowthRate = self._perpetualGrowthRate

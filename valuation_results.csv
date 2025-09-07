@@ -1,0 +1,182 @@
+ticker,fcff_fair_value,fcfe_fair_value,fcff_status,fcfe_status,fcff_error,fcfe_error,current_price,timestamp
+ACB,0.0,3.5,Success,Success,,,4.91,2025-09-07 22:55:46
+ACHV,,1.29,Failed,Success,'Tax Provision',,2.83,2025-09-07 22:55:48
+ACN,303.38,271.95,Success,Success,,,254.95,2025-09-07 22:55:50
+ADAP,-8.83,-2.53,Success,Success,,,0.041,2025-09-07 22:55:52
+ADBE,355.4,287.0,Success,Success,,,348.97,2025-09-07 22:55:54
+AEHR,,61.13,Failed,Success,'Interest Expense',,25.56,2025-09-07 22:55:56
+AEO,114.04,55.57,Success,Success,,,18.81,2025-09-07 22:55:58
+AEVA,,-71.63,Failed,Success,'Interest Expense',,13.95,2025-09-07 22:56:00
+AGX,,270.27,Failed,Success,'Interest Expense',,211.51,2025-09-07 22:56:02
+ALTS,0.0,0.09,Success,Success,,,4.395,2025-09-07 22:56:04
+ARCT,-282.5,-231.19,Success,Success,,,17.85,2025-09-07 22:56:06
+AREC,,0.03,Failed,Success,'Tax Provision',,1.87,2025-09-07 22:56:08
+ASAN,-258.89,-320.73,Success,Success,,,13.46,2025-09-07 22:56:10
+ATYR,,,Failed,Success,'Interest Expense',,5.61,2025-09-07 22:56:12
+AVAV,120.26,131.93,Success,Success,,,226.08,2025-09-07 22:56:14
+AVGX,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:56:16
+AVXL,,,Failed,Failed,'Capital Expenditure','Capital Expenditure',,2025-09-07 22:56:17
+BAM,,,Success,Success,,,58.27,2025-09-07 22:56:19
+BE,47.84,71.58,Success,Success,,,57.07,2025-09-07 22:56:21
+BITF,0.0,0.43,Success,Success,,,1.29,2025-09-07 22:56:23
+BLNK,-29.81,-21.82,Success,Success,,,1.02,2025-09-07 22:56:26
+BNC,0.0,0.06,Success,Success,,,20.5,2025-09-07 22:56:27
+BORR,0.55,1.66,Success,Success,,,3.04,2025-09-07 22:56:30
+BRBR,118.56,108.82,Success,Success,,,39.46,2025-09-07 22:56:31
+BRKR,103.97,166.45,Success,Success,,,30.83,2025-09-07 22:56:34
+BRLT,53.46,29.41,Success,Success,,,2.785,2025-09-07 22:56:35
+BRZE,-152.15,-101.64,Success,Success,,,31.42,2025-09-07 22:56:37
+BTI,6329.62,3305.74,Success,Success,,,56.02,2025-09-07 22:56:39
+BYND,-3205.78,-20.22,Success,Success,,,2.46,2025-09-07 22:56:41
+CAG,308.75,1479.17,Success,Success,,,19.28,2025-09-07 22:56:44
+CAPR,,-461.35,Failed,Success,'Interest Expense',,6.74,2025-09-07 22:56:46
+CBRL,821.06,485.34,Success,Success,,,52.81,2025-09-07 22:56:48
+CGC,-281.08,-539.31,Success,Success,,,1.46,2025-09-07 22:56:50
+CHWY,31.17,28.7,Success,Success,,,42.33,2025-09-07 22:56:52
+CIEN,437.45,517.75,Success,Success,,,116.69,2025-09-07 22:56:54
+CMBT,20510.06,237255.24,Success,Success,,,9.11,2025-09-07 22:56:56
+CMPS,0.0,1.99,Success,Success,,,5.14,2025-09-07 22:56:58
+CNC,2465.24,1508.83,Success,Success,,,28.98,2025-09-07 22:57:00
+CODI,463.51,595.27,Success,Success,,,7.28,2025-09-07 22:57:02
+COTY,54.58,99.46,Success,Success,,,4.37,2025-09-07 22:57:04
+CPB,1802.07,5839.57,Success,Success,,,34.03,2025-09-07 22:57:06
+CPRT,83.28,83.93,Success,Success,,,48.57,2025-09-07 22:57:08
+CRDO,,59.26,Failed,Success,'Interest Expense',,140.82,2025-09-07 22:57:10
+CRM,,252.99,Failed,Success,'Interest Expense',,250.76,2025-09-07 22:57:12
+CRON,0.0,-0.05,Success,Success,,,2.5,2025-09-07 22:57:13
+CTXR,0.0,0.0,Success,Success,,,1.23,2025-09-07 22:57:16
+CYTK,,-25.63,Failed,Success,'Tax Provision',,53.01,2025-09-07 22:57:17
+DNTH,,,Failed,Failed,'beta','beta',,2025-09-07 22:57:19
+DNUT,-68.17,-190.88,Success,Success,,,3.38,2025-09-07 22:57:21
+DOCU,16.3,17.87,Success,Success,,,79.86,2025-09-07 22:57:23
+DOW,-185.02,-176.96,Success,Success,,,24.5,2025-09-07 22:57:25
+EETH,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:57:27
+EIX,1399.56,1638.13,Success,Success,,,54.45,2025-09-07 22:57:29
+EMN,515.08,392.5,Success,Success,,,69.06,2025-09-07 22:57:31
+EQ,,,Success,Success,,,1.91,2025-09-07 22:57:32
+FDX,2896.23,1208.24,Success,Success,,,227.72,2025-09-07 22:57:34
+FETH,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:57:36
+FOLD,-218.64,-197.72,Success,Success,,,7.99,2025-09-07 22:57:38
+FRPT,702.89,808.16,Success,Success,,,55.27,2025-09-07 22:57:40
+FTEK,-1.03,-0.59,Success,Success,,,2.87,2025-09-07 22:57:41
+FTHM,-60.92,345.32,Success,Success,,,1.97,2025-09-07 22:57:44
+GDRX,6.83,23.67,Success,Success,,,4.0,2025-09-07 22:57:46
+GGAL,,,Failed,Failed,'Delta NWC','Delta NWC',,2025-09-07 22:57:48
+GGLL,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:57:50
+GIS,2803.64,4562.0,Success,Success,,,50.58,2025-09-07 22:57:51
+GPRO,-270.61,-238.82,Success,Success,,,1.49,2025-09-07 22:57:53
+GTLB,,-58.81,Failed,Success,'Interest Expense',,45.73,2025-09-07 22:57:55
+HIVE,0.0,0.52,Success,Success,,,2.66,2025-09-07 22:57:57
+HOLX,393.72,464.02,Success,Success,,,66.76,2025-09-07 22:57:59
+HPK,435.27,1005.12,Success,Success,,,7.49,2025-09-07 22:58:01
+ICHR,953.6,1267.52,Success,Success,,,16.88,2025-09-07 22:58:02
+IDR,,0.59,Failed,Success,'Tax Provision',,27.84,2025-09-07 22:58:05
+IFRX,inf,inf,Success,Success,,,1.65,2025-09-07 22:58:06
+INO,-23.19,-23.71,Success,Success,,,2.79,2025-09-07 22:58:08
+IONS,-43.64,155.4,Success,Success,,,61.23,2025-09-07 22:58:10
+IOT,-66.45,-62.31,Success,Success,,,42.09,2025-09-07 22:58:12
+IOVA,,,Failed,Success,'Interest Expense',,2.49,2025-09-07 22:58:14
+ITUB,,,Failed,Failed,'Delta NWC','Delta NWC',,2025-09-07 22:58:16
+IVVD,,,Failed,Success,'Interest Expense',,1.14,2025-09-07 22:58:18
+JMIA,0.0,3.11,Success,Success,,,8.86,2025-09-07 22:58:20
+KDP,227.9,797.84,Success,Success,,,28.65,2025-09-07 22:58:22
+KHC,1993.56,808.07,Success,Success,,,27.29,2025-09-07 22:58:24
+KNX,1450.66,1524.43,Success,Success,,,43.11,2025-09-07 22:58:26
+KODK,0.0,13.64,Success,Success,,,5.91,2025-09-07 22:58:29
+KPTI,-235.03,-3666.95,Success,Success,,,6.6,2025-09-07 22:58:31
+KR,2251.01,1056.77,Success,Success,,,67.75,2025-09-07 22:58:32
+KVUE,52.67,77.2,Success,Success,,,18.62,2025-09-07 22:58:34
+LASE,0.0,0.03,Success,Success,,,2.05,2025-09-07 22:58:37
+LEN,,308.07,Success,Success,,,141.88,2025-09-07 22:58:38
+LESL,-175.68,-299.25,Success,Success,,,0.3478,2025-09-07 22:58:41
+LQDA,,0.65,Failed,Success,'Tax Provision',,28.85,2025-09-07 22:58:43
+LRMR,,0.34,Failed,Success,'Interest Expense',,3.94,2025-09-07 22:58:44
+LULU,,459.05,Failed,Success,'Interest Expense',,167.8,2025-09-07 22:58:46
+LWLG,,0.28,Failed,Success,'Interest Expense',,3.27,2025-09-07 22:58:48
+LYB,1189.45,629.67,Success,Success,,,55.08,2025-09-07 22:58:50
+M,249.0,117.91,Success,Success,,,17.33,2025-09-07 22:58:52
+MANU,167.93,270.06,Success,Success,,,15.89,2025-09-07 22:58:54
+MAPS,,0.63,Failed,Success,'Interest Expense',,1.17,2025-09-07 22:58:56
+MBOT,,0.0,Failed,Success,'Tax Provision',,3.66,2025-09-07 22:58:58
+MBX,,,Failed,Failed,'beta','beta',,2025-09-07 22:59:00
+MEIP,,0.48,Failed,Success,'Interest Expense',,4.23,2025-09-07 22:59:01
+METC,-1873.73,-2968.48,Success,Success,,,28.18,2025-09-07 22:59:03
+MIAX,,,Failed,Failed,'beta','beta',,2025-09-07 22:59:05
+MJ,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:59:07
+MLTX,,2.59,Failed,Success,'Interest Expense',,59.44,2025-09-07 22:59:08
+MLYS,,0.53,Failed,Success,'Tax Provision',,34.8,2025-09-07 22:59:09
+MOH,2426.83,2107.86,Success,Success,,,174.65,2025-09-07 22:59:11
+MOMO,4157.05,754.0,Success,Success,,,8.52,2025-09-07 22:59:13
+MSOS,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:59:16
+MSOX,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:59:17
+MTA,904.14,1111.94,Success,Success,,,5.6,2025-09-07 22:59:18
+MYPS,18.97,20.94,Success,Success,,,0.9698,2025-09-07 22:59:19
+NEO,-32.46,31.66,Success,Success,,,7.98,2025-09-07 22:59:21
+NEON,-6.23,-4.4,Success,Success,,,5.11,2025-09-07 22:59:23
+NFE,-405.22,-845.24,Success,Success,,,2.45,2025-09-07 22:59:25
+NIO,-1160.56,-45.84,Success,Success,,,5.95,2025-09-07 22:59:27
+NNDM,0.0,5.08,Success,Success,,,1.35,2025-09-07 22:59:29
+NRGV,inf,inf,Success,Success,,,2.07,2025-09-07 22:59:31
+NUGT,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 22:59:34
+OLN,11385.02,8129.88,Success,Success,,,25.31,2025-09-07 22:59:35
+OMER,0.0,0.11,Success,Success,,,4.17,2025-09-07 22:59:37
+OPAD,-89.56,807.18,Success,Success,,,5.11,2025-09-07 22:59:39
+OPEN,-6.42,28.79,Success,Success,,,6.65,2025-09-07 22:59:41
+ORCL,244.91,273.3,Success,Success,,,232.8,2025-09-07 22:59:42
+OTLK,,,Failed,Failed,'Capital Expenditure','Capital Expenditure',,2025-09-07 22:59:45
+PACK,67.48,70.78,Success,Success,,,5.16,2025-09-07 22:59:46
+PATH,,-18.67,Failed,Success,'Interest Expense',,11.49,2025-09-07 22:59:48
+PCG,517.81,979.48,Success,Success,,,15.09,2025-09-07 22:59:50
+PD,-51.14,-7.83,Success,Success,,,16.47,2025-09-07 22:59:52
+PL,-13.33,-10.64,Success,Success,,,6.53,2025-09-07 22:59:54
+PLYM,,,Failed,Failed,'Capital Expenditure','Capital Expenditure',,2025-09-07 22:59:56
+PM,751.9,1078.95,Success,Success,,,161.55,2025-09-07 22:59:58
+PSNY,-10.92,31.18,Success,Success,,,1.01,2025-09-07 23:00:00
+PZZA,291.95,300.42,Success,Success,,,48.24,2025-09-07 23:00:02
+QVCGA,0.0,488.24,Success,Success,,,9.085,2025-09-07 23:00:04
+RBRK,,,Failed,Failed,'beta','beta',,2025-09-07 23:00:06
+REMX,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 23:00:08
+REPL,0.0,0.0,Success,Success,,,6.33,2025-09-07 23:00:09
+RH,1158.68,1472.6,Success,Success,,,251.0,2025-09-07 23:00:11
+RLMD,,,Failed,Failed,'Capital Expenditure','Capital Expenditure',,2025-09-07 23:00:13
+RMTI,,-0.08,Failed,Success,'Tax Provision',,1.62,2025-09-07 23:00:15
+RNA,,13.46,Failed,Success,'Tax Provision',,50.36,2025-09-07 23:00:17
+ROIV,-0.23,15.07,Success,Success,,,12.92,2025-09-07 23:00:18
+SAIL,,,Failed,Failed,'beta','beta',,2025-09-07 23:00:21
+SATS,-2400.51,-3227.53,Success,Success,,,67.24,2025-09-07 23:00:22
+SGMO,,-11.16,Failed,Success,'Interest Expense',,0.5472,2025-09-07 23:00:24
+SHOT,,0.06,Failed,Success,'Tax Provision',,0.3865,2025-09-07 23:00:26
+SIG,426.65,287.67,Success,Success,,,93.65,2025-09-07 23:00:28
+SMC,0.0,433.88,Success,Success,,,23.04,2025-09-07 23:00:30
+SNDL,0.0,4.39,Success,Success,,,2.48,2025-09-07 23:00:32
+SNDX,,inf,Failed,Success,'Tax Provision',,17.04,2025-09-07 23:00:34
+SNPS,418.26,370.02,Success,Success,,,598.14,2025-09-07 23:00:36
+SNY,642.46,539.01,Success,Success,,,46.5,2025-09-07 23:00:38
+SOGP,0.0,53.67,Success,Success,,,30.46,2025-09-07 23:00:40
+SOLT,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 23:00:42
+SOLZ,,,Failed,Failed,index 0 is out of bounds for axis 0 with size 0,index 0 is out of bounds for axis 0 with size 0,,2025-09-07 23:00:43
+SQM,,,Failed,Failed,'Operating Cash Flow','Operating Cash Flow',,2025-09-07 23:00:44
+SQNS,-1.22,-2.12,Success,Success,,,0.8614,2025-09-07 23:00:46
+SRPT,281.35,-74.96,Success,Success,,,18.71,2025-09-07 23:00:48
+STZ,825.55,672.19,Success,Success,,,148.43,2025-09-07 23:00:50
+SWBI,157.76,147.89,Success,Success,,,8.74,2025-09-07 23:00:51
+TLRY,-66.03,-89.29,Success,Success,,,1.19,2025-09-07 23:00:54
+TROX,-861.41,-1380.45,Success,Success,,,4.48,2025-09-07 23:00:55
+TSEM,444.28,443.74,Success,Success,,,63.21,2025-09-07 23:00:57
+TTMI,96.55,121.31,Success,Success,,,47.7,2025-09-07 23:00:59
+UAMY,0.0,0.32,Success,Success,,,4.51,2025-09-07 23:01:02
+UEC,,-inf,Success,Success,,,11.17,2025-09-07 23:01:04
+UP,0.0,0.0,Success,Success,,,2.0,2025-09-07 23:01:06
+UTHR,2006.71,2609.07,Success,Success,,,400.52,2025-09-07 23:01:08
+UUUU,-52.17,33.19,Success,Success,,,11.56,2025-09-07 23:01:09
+UWMC,,,Failed,Failed,'Delta NWC','Delta NWC',,2025-09-07 23:01:12
+VFF,-0.29,0.05,Success,Success,,,2.67,2025-09-07 23:01:14
+VGZ,,0.15,Failed,Success,'Interest Expense',,1.37,2025-09-07 23:01:15
+WEN,1171.74,417.74,Success,Success,,,10.33,2025-09-07 23:01:17
+WOLF,-107.9,254.4,Success,Success,,,1.25,2025-09-07 23:01:20
+WPM,254.7,238.02,Success,Success,,,104.24,2025-09-07 23:01:22
+WY,233.9,204.47,Success,Success,,,26.15,2025-09-07 23:01:23
+XFOR,inf,inf,Success,Success,,,3.5,2025-09-07 23:01:25
+XNET,0.0,0.34,Success,Success,,,7.65,2025-09-07 23:01:27
+ZEPP,-711.96,-136.81,Success,Success,,,49.98,2025-09-07 23:01:30
+ZS,-62.39,-98.36,Success,Success,,,274.2,2025-09-07 23:01:32

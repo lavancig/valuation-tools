@@ -11,59 +11,59 @@ class Controller:
         self._modelObj.requestFairValueCalculation(type, predictionWindow, ticker)
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(self._modelObj.getSharesOutstanding())
 
     def setDiscountTypeWACC(self):
         self._modelObj.setDiscountTypeWACC()
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
 
     def setDiscountCostOfEquity(self):
         self._modelObj.setDiscountCostOfEquity()
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
 
 
     def setDiscountTypeConstant(self, value):
         self._modelObj.setDiscountTypeConstant(value)
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
 
     def setProfitabilityTypeAverage(self):
         self._modelObj.setProfitabilityTypeLastYearsAverage()
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
 
     def setProfitabilityTypeConstant(self, value):
         self._modelObj.setProfitabilityTypeConstant(value)
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
 
     def setSharesOutstanding(self, number):
         self._modelObj.setSharesOutstanding(number)
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(number)
 
     def setFCFTypeConstant(self, value):
         self._modelObj.setFCFConstant(value)
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(self._modelObj.getSharesOutstanding())
     
     def setFCFTypeLastYearsAverage(self):
         self._modelObj.setFCFLastYearsAverage()
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(self._modelObj.getSharesOutstanding())
 
 
@@ -71,18 +71,22 @@ class Controller:
         self._modelObj.setRevenueSpecialistEstimates()
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(self._modelObj.getSharesOutstanding())
 
     def setRevenueTypeConstant(self, value):
         self._modelObj.setRevenueConstant(value)
         summaryTable = self._modelObj.getValuationSummaryTable()
         self._guiObj.updateValuationSummaryTable(summaryTable)
-        self._guiObj.updteFairValue( self._modelObj.getFairValue())
+        self._guiObj.updateFairValue( self._modelObj.getFairValue())
         self._guiObj.setSharesOutstanding(self._modelObj.getSharesOutstanding())
 
 
     def getAllScenarioValues(self):
         """Get all scenario values from the model"""
         return self._modelObj.getAllScenarioValues()
+
+    def getCurrentPrice(self):
+        """Get the current share price from the model"""
+        return self._modelObj.getCurrentPrice()
 

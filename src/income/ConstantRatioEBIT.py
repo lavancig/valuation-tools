@@ -122,22 +122,74 @@ class ConstantRatioEBIT:
         if hasattr(validPastEBITStreams, 'values'):
             if len(validPastEBITStreams.values.shape) == 1:
                 # It's a Series, use values directly
-                ebitStreamPredictions = pd.DataFrame([validPastEBITStreams.values], columns=validPastEBITStreams.index, index=['EBIT'])
+                # Convert dates to end of year
+                end_of_year_dates = []
+                for date in validPastEBITStreams.index:
+                    if hasattr(date, 'year'):
+                        # If it's already a datetime, set to end of year
+                        end_of_year_dates.append(pd.Timestamp(f"{date.year}-12-31"))
+                    else:
+                        # If it's a string or other format, try to parse and set to end of year
+                        try:
+                            parsed_date = pd.Timestamp(date)
+                            end_of_year_dates.append(pd.Timestamp(f"{parsed_date.year}-12-31"))
+                        except:
+                            end_of_year_dates.append(date)  # Fallback to original date
+                
+                ebitStreamPredictions = pd.DataFrame([validPastEBITStreams.values], columns=end_of_year_dates, index=['EBIT'])
             else:
                 # It's a DataFrame, extract the first row
-                ebitStreamPredictions = pd.DataFrame([validPastEBITStreams.iloc[0].values], columns=validPastEBITStreams.columns, index=['EBIT'])
+                # Convert dates to end of year
+                end_of_year_dates = []
+                for date in validPastEBITStreams.columns:
+                    if hasattr(date, 'year'):
+                        # If it's already a datetime, set to end of year
+                        end_of_year_dates.append(pd.Timestamp(f"{date.year}-12-31"))
+                    else:
+                        # If it's a string or other format, try to parse and set to end of year
+                        try:
+                            parsed_date = pd.Timestamp(date)
+                            end_of_year_dates.append(pd.Timestamp(f"{parsed_date.year}-12-31"))
+                        except:
+                            end_of_year_dates.append(date)  # Fallback to original date
+                
+                ebitStreamPredictions = pd.DataFrame([validPastEBITStreams.iloc[0].values], columns=end_of_year_dates, index=['EBIT'])
         else:
             # Fallback for other data types
-            ebitStreamPredictions = pd.DataFrame([validPastEBITStreams], columns=validPastEBITStreams.index, index=['EBIT'])
+            # Convert dates to end of year
+            end_of_year_dates = []
+            for date in validPastEBITStreams.index:
+                if hasattr(date, 'year'):
+                    # If it's already a datetime, set to end of year
+                    end_of_year_dates.append(pd.Timestamp(f"{date.year}-12-31"))
+                else:
+                    # If it's a string or other format, try to parse and set to end of year
+                    try:
+                        parsed_date = pd.Timestamp(date)
+                        end_of_year_dates.append(pd.Timestamp(f"{parsed_date.year}-12-31"))
+                    except:
+                        end_of_year_dates.append(date)  # Fallback to original date
+            
+            ebitStreamPredictions = pd.DataFrame([validPastEBITStreams], columns=end_of_year_dates, index=['EBIT'])
 
         # Calculate future EBIT using profitability table
         for date in revenueStreams.columns.values:
-            if date in validPastEBITStreams.index:
+            # Convert date to end of year for consistency
+            if hasattr(date, 'year'):
+                end_of_year_date = pd.Timestamp(f"{date.year}-12-31")
+            else:
+                try:
+                    parsed_date = pd.Timestamp(date)
+                    end_of_year_date = pd.Timestamp(f"{parsed_date.year}-12-31")
+                except:
+                    end_of_year_date = date  # Fallback to original date
+            
+            if end_of_year_date in ebitStreamPredictions.columns:
                 continue  # Keep historical data as is
             # Use profitability from table to calculate EBIT
             profitability = profitabilityTable.loc['EBIT Margin', date]
             revenue = revenueStreams.loc['Revenue', date]
-            ebitStreamPredictions.loc['EBIT', date] = revenue * profitability
+            ebitStreamPredictions.loc['EBIT', end_of_year_date] = revenue * profitability
             
         return ebitStreamPredictions
 

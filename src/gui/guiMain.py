@@ -22,8 +22,8 @@ class GuiMain:
         tabControl = ttk.Notebook(self.root)
         
         # Creates tab objects
-        self._valuationTab = ValuationTab(tabControl)
         self._discountTab = DiscountTab(tabControl)
+        self._valuationTab = ValuationTab(tabControl, self._discountTab)
         self._profitabilityTab = ProfitabilityTab(tabControl)
         self._fcfTab = FCFTab(tabControl)
         self._revenueTab = RevenueTab(tabControl)
@@ -32,7 +32,6 @@ class GuiMain:
 
 
         # Sets tabs in place
-        suitabilityTab = ttk.Frame(tabControl)
         valuationTab = self._valuationTab.getValuationTab()
         discountTab = self._discountTab.getDiscountTab()
         profitabilityTab = self._profitabilityTab.getProfitabilityTab()
@@ -41,7 +40,6 @@ class GuiMain:
         parametersTab = getParametersTab(tabControl)
         sensitivityTab = self._sensitivityTab.frame
         
-        tabControl.add(suitabilityTab, text ='Suitability')
         tabControl.add(valuationTab, text ='Valuation')
         tabControl.add(discountTab, text ='Discount')
         tabControl.add(profitabilityTab, text ='Profitability')
@@ -50,15 +48,7 @@ class GuiMain:
         tabControl.add(parametersTab, text ='Parameters')
         tabControl.add(sensitivityTab, text ='Sensitivity Analysis')
 
-        tabControl.pack(expand = 1, fill ="both")
-        
-        ttk.Label(suitabilityTab, 
-                text ="Under Development").grid(column = 0, 
-                                    columnspan = 5,
-                                    row = 0,
-                                    padx = 10,
-                                    pady = 10, 
-                                    sticky = tk.W+tk.E)  
+        tabControl.pack(expand = 1, fill ="both")  
 
     def registerController(self, controllerObj):
         self._controllerObj = controllerObj
@@ -76,7 +66,7 @@ class GuiMain:
             pass
 
     def addDiscountTab(self, discountObj):
-        discountTab = getDiscountTab(discountObj)
+        discountTab = self._discountTab.getDiscountTab()
         tabControl.add(discountTab, text ='Discount')
         # tabControl.pack_forget()
         # tabControl.pack(expand = 1, fill ="both")
@@ -84,11 +74,11 @@ class GuiMain:
     def startGUI(self):
         self.root.mainloop()
 
-    def updteFairValue(self, fairValue):
+    def updateFairValue(self, fairValue):
         self._valuationTab.updateLoadingLabel(fairValue)
 
     def updateValuationSummaryTable(self, summaryTable):
-        self._valuationTab.updateSummaryTable(summaryTable)
+        self._valuationTab.updateValuationSummaryTable(summaryTable)
         # Refresh sensitivity tab status when valuation is updated (defensively)
         try:
             self._sensitivityTab.refresh_status()

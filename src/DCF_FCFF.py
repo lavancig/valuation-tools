@@ -2,32 +2,78 @@ import numpy as np
 import yfinance as yf
 import pandas as pd
 import copy 
-# Fallback to absolute imports when running as script
-from src.globals import getGlobal
-from src.revenue.ConstantGrowthRevenue import ConstantGrowthRevenue
-from src.revenue.AnalystRevenueGrowth import RevenueForecast
-from src.growth.AnalystGrowthEstimates import AnalystGrowthEstimates
-from src.growth.ConstantGrowthEstimates import ConstantGrowthEstimates
-from src.income.ConstantMarginIncome import ConstantMarginIncome
-from src.income.ConstantRatioEBIT import ConstantRatioEBIT
-from src.fcf.ConstantIncomeToFCF import ConstantIncomeToFCF
-from src.fcf.ConstantRatioDandA import ConstantRatioDandA
-from src.fcf.ConstantRatioCapEx import ConstantRatioCapEx
-from src.fcf.ConstantRatioDeltaNWC import ConstantRatioDeltaNWC
-from src.fcf.ConstantRatioNetBorrowings import ConstantRatioNetBorrowings
-from src.discoundRate.ConstantDiscountRate import ConstantDiscountRate
-from src.discoundRate.WACCDiscountRate import WACCDiscountRate
-from src.discoundRate.CostOfEquityDiscountRate import CostOfEquityDiscountRate
-from src.PresentValue import PresentValue
-from src.tax.TaxRateCalculator import TaxRateCalculator
 
-# Calculates fair value based on free cash flow to equity
-class DCF_FCFE:
+# Handle both relative and absolute imports
+try:
+    from .globals import getGlobal
+    from .revenue.ConstantGrowthRevenue import ConstantGrowthRevenue
+    from .revenue.AnalystRevenueGrowth import RevenueForecast
+    from .growth.AnalystGrowthEstimates import AnalystGrowthEstimates
+    from .growth.ConstantGrowthEstimates import ConstantGrowthEstimates
+    from .income.ConstantMarginIncome import ConstantMarginIncome
+    from .income.ConstantRatioEBIT import ConstantRatioEBIT
+    from .fcf.ConstantIncomeToFCF import ConstantIncomeToFCF
+    from .fcf.ConstantRatioDandA import ConstantRatioDandA
+    from .fcf.ConstantRatioCapEx import ConstantRatioCapEx
+    from .fcf.ConstantRatioDeltaNWC import ConstantRatioDeltaNWC
+    from .fcf.ConstantRatioNetBorrowings import ConstantRatioNetBorrowings
+    from .discoundRate.ConstantDiscountRate import ConstantDiscountRate
+    from .discoundRate.WACCDiscountRate import WACCDiscountRate
+    from .discoundRate.CostOfEquityDiscountRate import CostOfEquityDiscountRate
+    from .PresentValue import PresentValue
+    from .tax.TaxRateCalculator import TaxRateCalculator
+except ImportError:
+    # Fallback to absolute imports when running as script
+    from globals import getGlobal
+    from revenue.ConstantGrowthRevenue import ConstantGrowthRevenue
+    from revenue.AnalystRevenueGrowth import RevenueForecast
+    from growth.AnalystGrowthEstimates import AnalystGrowthEstimates
+    from growth.ConstantGrowthEstimates import ConstantGrowthEstimates
+    from income.ConstantMarginIncome import ConstantMarginIncome
+    from income.ConstantRatioEBIT import ConstantRatioEBIT
+    from fcf.ConstantIncomeToFCF import ConstantIncomeToFCF
+    from fcf.ConstantRatioDandA import ConstantRatioDandA
+    from fcf.ConstantRatioCapEx import ConstantRatioCapEx
+    from fcf.ConstantRatioDeltaNWC import ConstantRatioDeltaNWC
+    from fcf.ConstantRatioNetBorrowings import ConstantRatioNetBorrowings
+    from discoundRate.ConstantDiscountRate import ConstantDiscountRate
+    from discoundRate.WACCDiscountRate import WACCDiscountRate
+    from discoundRate.CostOfEquityDiscountRate import CostOfEquityDiscountRate
+    from PresentValue import PresentValue
+    from tax.TaxRateCalculator import TaxRateCalculator
+
+# Calculates fair value based on free cash flow to firm
+class DCF_FCFF:
     def __init__(self, companyTicker):
         self._successful = False
         self.downloadCompanyData(companyTicker)
         if(not self._successful):
             return
+
+        # Revenue Projection Object
+        # Extract growth estimates from the new yfinance API structure
+        # growth_estimates = self._analysis.growth_estimates
+        # if growth_estimates is not None and not growth_estimates.empty:
+        #     # Create a Series with the expected index format
+        #     growth_data = {}
+        #     if '0y' in growth_estimates.index:
+        #         growth_data['0Y'] = growth_estimates.loc['0y', 'stockTrend']
+        #     if '+1y' in growth_estimates.index:
+        #         growth_data['+1Y'] = growth_estimates.loc['+1y', 'stockTrend']
+        #     if 'LTG' in growth_estimates.index and pd.notna(growth_estimates.loc['LTG', 'stockTrend']):
+        #         growth_data['+5Y'] = growth_estimates.loc['LTG', 'stockTrend']
+        #     else:
+        #         # Fallback to a reasonable estimate if LTG is not available
+        #         growth_data['+5Y'] = getGlobal('economyGrowth')
+            
+        #     growth_series = pd.Series(growth_data)
+        # else:
+        #     # Fallback to constant growth if no analyst estimates available
+        #     growth_series = pd.Series({
+        #         '0Y': getGlobal('economyGrowth'),
+        #         '+1Y': getGlobal('economyGrowth'),
+        #         '+5Y': getGlobal('economyGrowth')
+        #     })
 
         # Initialize growth estimates object first
         self.setGrowthEstimates()
@@ -59,7 +105,7 @@ class DCF_FCFE:
             self._ebitObj = ConstantRatioEBIT(self._financialData.loc[revenue_row], dummy_ebit)
             self._dummy_ebit = dummy_ebit
         
-        # Free cash flow object
+        # Free cash flow to firm object
         self._fcfObj = ConstantIncomeToFCF(self._financialData, self._cashFlowData)
         
         # Forecasting objects for additional metrics
@@ -116,13 +162,15 @@ class DCF_FCFE:
         currentSharePrice = self._getCurrentSharePrice()
         sharesOutstanding = self._companyInfo.get('sharesOutstanding', 1)
         
-        # self.setDiscountWACC()
-        self.setDiscountCostOfEquity()
+        self.setDiscountWACC()
+        # self.setDiscountCostOfEquity()
 
 
+        # Present Value Object
+        # self._presentValueObj = PresentValue(self._timeNow)
+        
         # Tax Rate Calculator
         self._taxRateCalculator = TaxRateCalculator(self._financialData)
-        
             
     def downloadCompanyData(self, ticker):
         try:
@@ -208,11 +256,11 @@ class DCF_FCFE:
                         raise Exception(f"Row {name} not found in balance sheet")
                 return total
             
-            def _convert_to_end_of_year(values):
+            def _convert_to_end_of_year(values, dates):
                 """Convert values to end-of-year (December 31st) by adjusting for time periods"""
-                end_of_year_values = pd.Series(dtype=float)
+                end_of_year_values = pd.Series(index=dates, dtype=float)
                 
-                for i, date in enumerate(values.index):
+                for i, date in enumerate(dates):
                     # Convert date to December 31st of the same year
                     if hasattr(date, 'year'):
                         eoy_date = pd.Timestamp(f"{date.year}-12-31")
@@ -226,7 +274,7 @@ class DCF_FCFE:
                             eoy_date = date
                     
                     # Use the value as-is (balance sheet data is typically already end-of-year)
-                    end_of_year_values[eoy_date] = values.iloc[i]
+                    end_of_year_values[date] = values.iloc[i]
                 
                 return end_of_year_values
             
@@ -252,7 +300,7 @@ class DCF_FCFE:
             invested_capital = total_assets - operating_liabilities
             
             # Convert to end-of-year values
-            invested_capital_eoy = _convert_to_end_of_year(invested_capital)
+            invested_capital_eoy = _convert_to_end_of_year(invested_capital, self._balancesheetData.columns)
             
             # Remove NaN values and ensure non-negative values
             invested_capital_eoy = invested_capital_eoy.fillna(0).clip(lower=0)
@@ -467,25 +515,27 @@ class DCF_FCFE:
             for col in netBorrowingsTable.columns:
                 netBorrowingsTable.loc['Net Borrowings', col] = netBorrowingsTable.loc['Net Borrowings', col] * borrowings_adjustment
 
-        # Calculates FCFE using the already calculated tables
+        # Get tax rate table from TaxRateCalculator
+        taxRateTable = self._taxRateCalculator.getTaxRateTable(revenueTable.columns)
+
+        # Calculates FCFF using the already calculated tables
         # Create a comprehensive cash flow table with all the components
-        comprehensiveCashFlowData = pd.DataFrame(index=['Net Income', 'D&A', 'CapEx', 'Delta NWC', 'Net Borrowings', 'Invested Capital'], columns=revenueTable.columns)
+        comprehensiveCashFlowData = pd.DataFrame(index=['EBIT', 'D&A', 'CapEx', 'Delta NWC', 'Net Borrowings', 'Tax Rate', 'Invested Capital'], columns=revenueTable.columns)
         
         # Fill in the data from our calculated tables
-        comprehensiveCashFlowData.loc['Net Income'] = incomeTable.loc['Income']
+        comprehensiveCashFlowData.loc['EBIT'] = ebitTable.loc['EBIT']
         comprehensiveCashFlowData.loc['D&A'] = dandATable.loc['D&A']
         comprehensiveCashFlowData.loc['CapEx'] = capExTable.loc['CapEx']
         comprehensiveCashFlowData.loc['Delta NWC'] = deltaNWCTable.loc['Delta NWC']
         comprehensiveCashFlowData.loc['Net Borrowings'] = netBorrowingsTable.loc['Net Borrowings']
+        comprehensiveCashFlowData.loc['Tax Rate'] = taxRateTable.loc['Tax Rate']
         
         # Add invested capital data
         investedCapitalData = self._calculateInvestedCapital()
         comprehensiveCashFlowData.loc['Invested Capital'] = investedCapitalData
+        # Tax rate will be calculated by the FCFF method
         
-        fcfeTable = self._fcfObj.estimateFCFE(incomeTable, comprehensiveCashFlowData)
-
-        # Get tax rate table from TaxRateCalculator
-        taxRateTable = self._taxRateCalculator.getTaxRateTable(revenueTable.columns)
+        fcffTable = self._fcfObj.estimateFCFF(ebitTable, comprehensiveCashFlowData, self._taxRateCalculator)
 
         # Gets shares outstanding from company info
         if 'sharesOutstanding' in self._companyInfo:
@@ -493,14 +543,15 @@ class DCF_FCFE:
         else:
             sharesOutstanding = 1
 
-        presentValueTable = self.getPresentValueTable(fcfeTable, discountTable)
-        pricePerShare = self._presentValueObj.getPresentValue(fcfeTable, discountTable, "FCFE") / sharesOutstanding
+        presentValueTable = self.getPresentValueTable(fcffTable, discountTable)
+        pricePerShare = self._presentValueObj.getPresentValue(fcffTable, discountTable, "FCFF") / sharesOutstanding
+    
         
         # Create summary table for this scenario
         summaryTable = self._createSummaryTable(
             growthTable, discountTable, revenueTable, profitabilityTable, 
             incomeTable, ebitProfitabilityTable, ebitTable, dandATable, 
-            capExTable, deltaNWCTable, netBorrowingsTable, fcfeTable, 
+            capExTable, deltaNWCTable, netBorrowingsTable, fcffTable, 
             taxRateTable, presentValueTable, pricePerShare
         )
         
@@ -517,12 +568,12 @@ class DCF_FCFE:
             self._capExTable = capExTable
             self._deltaNWCTable = deltaNWCTable
             self._netBorrowingsTable = netBorrowingsTable
-            self._fcfeTable = fcfeTable
+            self._fcffTable = fcffTable
+            self._taxRateTable = taxRateTable
             self._presentValueTable = presentValueTable
             self._sharesOutstanding = sharesOutstanding
             self._pricePerShare = pricePerShare
             self._taxRateTable = taxRateTable
-            
             
             # Print individual fair value estimate
             self._printIndividualFairValue("custom", pricePerShare)
@@ -531,7 +582,7 @@ class DCF_FCFE:
     
     def _createSummaryTable(self, growthTable, discountTable, revenueTable, profitabilityTable, 
                            incomeTable, ebitProfitabilityTable, ebitTable, dandATable, 
-                           capExTable, deltaNWCTable, netBorrowingsTable, fcfeTable, 
+                           capExTable, deltaNWCTable, netBorrowingsTable, fcffTable, 
                            taxRateTable, presentValueTable, pricePerShare):
         """Create comprehensive valuation summary table with all financial metrics"""
         # Get the years from revenue table (includes both historical and projected)
@@ -566,19 +617,22 @@ class DCF_FCFE:
         
         # 10. Net Borrowings (already in netBorrowingsTable)
         
-        # 11. FCFE (already in fcfeTable)
+        # 11. FCFF (already in fcffTable)
         
         # 12. Cash flow to net income (from FCF object)
-        cashFlowToNetIncomeTable = self._fcfObj.getCashFlowToNetIncomeRatio(fcfeTable, incomeTable)
+        cashFlowToNetIncomeTable = self._fcfObj.getCashFlowToNetIncomeRatio(fcffTable, incomeTable)
         
-        # 13. Discount rate (already in discountTable)
+        # 13. Tax rate (from TaxRateCalculator)
+        taxRateTable = self._taxRateCalculator.getTaxRateTable(revenueTable.columns)
         
-        # 14. Present value (already in presentValueTable)
+        # 14. Discount rate (already in discountTable)
+        
+        # 15. Present value (already in presentValueTable)
         
         # Filter out empty DataFrames before concatenation to avoid deprecation warnings
         # Reorder tables to start with: Growth estimates, Discount rate, Revenue
         tables_to_concat = []
-        for table in [growthRatesTable, discountTable, revenueTable, profitabilityTable, incomeTable, ebitRatioTable, ebitTable, dandATable, capExTable, deltaNWCTable, netBorrowingsTable, fcfeTable, cashFlowToNetIncomeTable, taxRateTable, presentValueTable]:
+        for table in [growthRatesTable, discountTable, revenueTable, profitabilityTable, incomeTable, ebitRatioTable, ebitTable, dandATable, capExTable, deltaNWCTable, netBorrowingsTable, fcffTable, cashFlowToNetIncomeTable, taxRateTable, presentValueTable]:
             if table is not None and not table.empty and table.shape[1] > 0:
                 # Ensure all tables have the same column structure
                 if not table.empty and hasattr(table, 'columns'):
@@ -597,16 +651,13 @@ class DCF_FCFE:
             # Create fair value row - show the fair value only in the current year (last column)
             fairValueRow = pd.DataFrame(index=['Fair Value (per share)'], columns=revenueTable.columns)
             # Set all values to empty except the last column (current year)
-            for col in revenueTable.columns:
-                fairValueRow.loc['Fair Value (per share)', col] = ''
             
-            # Set the fair value in the last column (current year)
             fairValueRow.loc['Fair Value (per share)', self._timeNow] = pricePerShare
             
             # Add the fair value row to the result table
             if not resultTable.empty:
                 resultTable = pd.concat([resultTable, fairValueRow], axis=0)
-            else:
+        else:
                 resultTable = fairValueRow
         
         # Format specific rows to show values in millions with 'M' suffix
@@ -732,7 +783,7 @@ class DCF_FCFE:
                 summaryTable = self._createSummaryTable(
                     self._growthTable, self._discountTable, self._revenueTable, self._profitabilityTable,
                     self._incomeTable, self._ebitProfitabilityTable, self._ebitTable, self._dandATable,
-                    self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcfeTable,
+                    self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcffTable,
                     self._taxRateTable, self._presentValueTable, self._pricePerShare
                 )
             else:
@@ -747,6 +798,31 @@ class DCF_FCFE:
         print("SUMMARY TABLE (CSV FORMAT)")
         print("="*80)
         
+        # Print header row (column names)
+        columns = summaryTable.columns.tolist()
+        header = "Metric," + ",".join([str(col) for col in columns])
+        print(header)
+        
+        # Print data rows
+        for index, row in summaryTable.iterrows():
+            # Create row data with metric name and values
+            row_data = [str(index)]
+            for col in columns:
+                value = row[col]
+                if pd.isna(value):
+                    row_data.append("")
+                else:
+                    # Convert to string and handle different data types
+                    if isinstance(value, (int, float)):
+                        row_data.append(str(value))
+                    else:
+                        row_data.append(str(value))
+            
+            print(",".join(row_data))
+        
+        print("="*80)
+        print("END OF SUMMARY TABLE")
+        print("="*80 + "\n")
     
     def getSummaryTableAsCSV(self, summaryTable=None):
         """Get the summary table as CSV string that can be easily converted to pandas DataFrame"""
@@ -756,7 +832,7 @@ class DCF_FCFE:
                 summaryTable = self._createSummaryTable(
                     self._growthTable, self._discountTable, self._revenueTable, self._profitabilityTable,
                     self._incomeTable, self._ebitProfitabilityTable, self._ebitTable, self._dandATable,
-                    self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcfeTable,
+                    self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcffTable,
                     self._taxRateTable, self._presentValueTable, self._pricePerShare
                 )
             else:
@@ -798,7 +874,7 @@ class DCF_FCFE:
                 summaryTable = self._createSummaryTable(
                     self._growthTable, self._discountTable, self._revenueTable, self._profitabilityTable,
                     self._incomeTable, self._ebitProfitabilityTable, self._ebitTable, self._dandATable,
-                    self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcfeTable,
+                    self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcffTable,
                     self._taxRateTable, self._presentValueTable, self._pricePerShare
                 )
             else:
@@ -875,7 +951,7 @@ class DCF_FCFE:
         return self._discountRateObj.getDiscountRates(timeSeries)
 
     def getPresentValueTable(self, incomeTable, discountRateTable):
-        return self._presentValueObj.getPresentValues(incomeTable, discountRateTable, "FCFE")
+        return self._presentValueObj.getPresentValues(incomeTable, discountRateTable, "FCFF")
 
     def getTimeIndexes(self, currentTimeIndexes, untilTime):
         """Create a clean time series with one entry per year in chronological order"""
@@ -922,7 +998,7 @@ class DCF_FCFE:
             return self._createSummaryTable(
                 self._growthTable, self._discountTable, self._revenueTable, self._profitabilityTable,
                 self._incomeTable, self._ebitProfitabilityTable, self._ebitTable, self._dandATable,
-                self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcfeTable,
+                self._capExTable, self._deltaNWCTable, self._netBorrowingsTable, self._fcffTable,
                 self._taxRateTable, self._presentValueTable, self._pricePerShare
             )
         else:

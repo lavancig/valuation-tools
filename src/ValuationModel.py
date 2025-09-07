@@ -1,4 +1,5 @@
 from .DCF_FCFE import DCF_FCFE
+from .DCF_FCFF import DCF_FCFF
 
 
 
@@ -15,6 +16,8 @@ class ValuationModel:
         self._predictionWindow = predictionWindow
         if type == "FCFE":
             self._valuationObj = DCF_FCFE(ticker)
+        elif type == "FCFF":
+            self._valuationObj = DCF_FCFF(ticker)
         else:
             print("Valuation type " + type + " Unimplemented. Aborting")
         
@@ -27,6 +30,10 @@ class ValuationModel:
 
     def getFairValue(self):
         return self._valuationObj.getFairValue()
+    
+    def getCurrentPrice(self):
+        """Get the current share price"""
+        return self._valuationObj.getCurrentPrice()
     
     def getAllScenarioValues(self):
         """Get fair values for all three scenarios"""

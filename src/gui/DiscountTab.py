@@ -86,5 +86,10 @@ class DiscountTab:
         while len(self._typeSpecificWidgets) > 0:
             self._typeSpecificWidgets.pop(0).destroy()
 
+    def setDiscountType(self, discountType):
+        """Set the discount type selection"""
+        if discountType in discountTypes:
+            self._discountTypeSelection.set(discountType)
+
     def registerController(self, controllerObj):
         self._controllerObj = controllerObj

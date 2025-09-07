@@ -77,15 +77,60 @@ class ConstantIncomeToFCF:
         self._netBorrowingsTable = netBorrowingsTable
         return fcfPredictions
 
+    def estimateFCFF(self, predictedEBIT, cashFlows, taxRateCalculator=None):
+        """Estimate Free Cash Flow to Firm (FCFF) - same as FCFE but without net borrowings"""
+        fcffPredictions = pd.DataFrame([], columns=predictedEBIT.columns.values, index=['FCFF'])
+        taxRateTable = pd.DataFrame([], columns=predictedEBIT.columns.values, index=['Tax Rate'])
+        
+        for date in predictedEBIT.columns.values:
+            if(date in cashFlows.columns.values):
+                # Get EBIT for this date
+                ebit = cashFlows.loc['EBIT', date] if 'EBIT' in cashFlows.index and pd.notna(cashFlows.loc['EBIT', date]) else predictedEBIT.loc['EBIT', date] if pd.notna(predictedEBIT.loc['EBIT', date]) else 0
+                
+                # Get D&A (Depreciation & Amortization)
+                da = cashFlows.loc['D&A', date] if 'D&A' in cashFlows.index and pd.notna(cashFlows.loc['D&A', date]) else 0
+                
+                # Get CapEx (Capital Expenditure)
+                capex = cashFlows.loc['CapEx', date] if 'CapEx' in cashFlows.index and pd.notna(cashFlows.loc['CapEx', date]) else 0
+                
+                # Get ΔNWC (Change in Net Working Capital)
+                deltaNWC = cashFlows.loc['Delta NWC', date] if 'Delta NWC' in cashFlows.index and pd.notna(cashFlows.loc['Delta NWC', date]) else 0
+                
+                # Calculate tax rate using TaxRateCalculator
+                taxRate = cashFlows.loc['Tax Rate', date]
+ # Default tax rate if no calculator provided
+                
+                # Calculate FCFF using the formula: FCFF = EBIT * (1 - Tax Rate) + D&A - CapEx - ΔNWC
+                # Note: FCFF does not include net borrowings (unlike FCFE)
+                fcffPredictions.loc['FCFF', date] = ebit * (1 - taxRate) + da - capex - deltaNWC
+                continue
+        
+            
+            # fcffPredictions.loc['FCFF', date] = predictedEBIT.loc['EBIT', date] * self._cashFlowToNetIncomeRatio
+        
+        # Store tax rate table for later use
+        return fcffPredictions
+
     def getCashFlowToNetIncomeRatio(self, predictedCashFlows, predictedIncome):
         cashFlowToNetIncomeRatio = pd.DataFrame([], columns=predictedIncome.columns.values, index=['Cash Flow To Net Income Ratio'])
         for date in cashFlowToNetIncomeRatio.columns.values:
-            cashFlowToNetIncomeRatio.loc['Cash Flow To Net Income Ratio', date] = predictedCashFlows.loc['FCFE', date] / predictedIncome.loc['Income', date]
+            # Handle both FCFE and FCFF
+            if 'FCFE' in predictedCashFlows.index:
+                cashFlowToNetIncomeRatio.loc['Cash Flow To Net Income Ratio', date] = predictedCashFlows.loc['FCFE', date] / predictedIncome.loc['Income', date]
+            elif 'FCFF' in predictedCashFlows.index:
+                cashFlowToNetIncomeRatio.loc['Cash Flow To Net Income Ratio', date] = predictedCashFlows.loc['FCFF', date] / predictedIncome.loc['Income', date]
         return cashFlowToNetIncomeRatio
     
     def getNetBorrowingsTable(self):
         """Get the net borrowings table"""
         if hasattr(self, '_netBorrowingsTable'):
             return self._netBorrowingsTable
+        else:
+            return pd.DataFrame()
+    
+    def getTaxRateTable(self):
+        """Get the tax rate table"""
+        if hasattr(self, '_taxRateTable'):
+            return self._taxRateTable
         else:
             return pd.DataFrame()
